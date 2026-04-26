@@ -1,0 +1,16 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(cat)",
+      "Read(//tmp/**)",
+      "Bash(dotnet build *)",
+      "Bash(dotnet ef *)",
+      "Bash(dotnet tool install *)",
+      "Bash(dotnet run *)",
+      "Bash(kill %1)",
+      "Bash(taskkill /IM \"School.API.exe\" /F)",
+      "Bash(taskkill /IM \"dotnet.exe\" /F)",
+      "PowerShell(Stop-Process *)"
+    ]
+  }
+}

@@ -1,0 +1,9 @@
+namespace School.Domain.Entities.Inventory;
+
+public class ProductVariant
+{
+    public int    Id          { get; set; }
+    public int    ProductId   { get; set; }
+    public string VariantType { get; set; } = string.Empty;
+    public string Value       { get; set; } = string.Empty;
+}

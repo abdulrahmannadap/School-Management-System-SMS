@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Authentication.Cookies;
 using School.Application.Interfaces;
+using School.Application.Services.Exam;
 using School.Application.Services.Fees;
 using School.Application.Services.Inventory;
 using School.Application.Services.Library;
@@ -22,6 +23,7 @@ builder.Services.AddScoped<IStaffService, StaffService>();
 builder.Services.AddScoped<IFeesService, FeesService>();
 builder.Services.AddScoped<ILibraryService, LibraryService>();
 builder.Services.AddScoped<IInventoryService, InventoryService>();
+builder.Services.AddScoped<IExamService, ExamService>();
 builder.Services.AddHttpClient<IBookAggregatorService, BookAggregatorService>();
 
 builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)

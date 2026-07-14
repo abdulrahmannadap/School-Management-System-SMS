@@ -1,0 +1,255 @@
+@model School.Web.Models.Library.BooksIndexViewModel
+@{ ViewData["Title"] = "Books"; }
+
+@if (TempData["Success"] is string success)
+{
+    <div class="alert alert-success alert-dismissible fade show" role="alert">
+        @success
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    </div>
+}
+
+<div class="card border-0 shadow-sm mb-3">
+    <div class="card-body">
+        <form method="get" class="row g-2 align-items-end">
+            <div class="col-sm-3">
+                <label class="form-label small">Title</label>
+                <input type="text" name="Title" value="@Model.Search.Title" class="form-control form-control-sm" />
+            </div>
+            <div class="col-sm-3">
+                <label class="form-label small">Author</label>
+                <input type="text" name="Author" value="@Model.Search.Author" class="form-control form-control-sm" />
+            </div>
+            <div class="col-sm-3">
+                <label class="form-label small">Category</label>
+                <select name="CategoryId" class="form-select form-select-sm">
+                    <option value="">All</option>
+                    @foreach (var c in Model.Categories)
+                    {
+                        <option value="@c.Id" selected="@(Model.Search.CategoryId == c.Id)">@c.CategoryName</option>
+                    }
+                </select>
+            </div>
+            <div class="col-sm-3 d-flex gap-2">
+                <button type="submit" class="btn btn-sm btn-outline-primary flex-fill"><i class="bi bi-search me-1"></i>Search</button>
+                <a asp-action="Books" class="btn btn-sm btn-outline-secondary"><i class="bi bi-x-lg"></i></a>
+            </div>
+        </form>
+    </div>
+</div>
+
+<div class="card border-0 shadow-sm">
+    <div class="card-header bg-white border-0 pt-3 d-flex justify-content-between align-items-center">
+        <h6 class="mb-0 fw-semibold"><i class="bi bi-bookshelf me-2 text-primary"></i>Books</h6>
+        <div class="d-flex gap-2">
+            <button type="button" class="btn btn-sm btn-outline-secondary" onclick="categoryModal.show()">
+                <i class="bi bi-tags me-1"></i>Manage Categories
+            </button>
+            @if (Model.Categories.Any())
+            {
+                <button type="button" class="btn btn-sm btn-primary" onclick="openCreateModal()">
+                    <i class="bi bi-plus-circle me-1"></i>Add New
+                </button>
+            }
+        </div>
+    </div>
+    <div class="card-body">
+        @if (!Model.Categories.Any())
+        {
+            <div class="text-center text-muted py-5">
+                <i class="bi bi-exclamation-triangle" style="font-size:2.5rem;opacity:.3"></i>
+                <p class="mt-2 mb-0">Add a Book Category first before adding books.</p>
+            </div>
+        }
+        else if (!Model.Items.Any())
+        {
+            <div class="text-center text-muted py-5">
+                <i class="bi bi-bookshelf" style="font-size:2.5rem;opacity:.3"></i>
+                <p class="mt-2 mb-0">No books yet</p>
+            </div>
+        }
+        else
+        {
+            <div class="table-responsive">
+                <table class="table align-middle">
+                    <thead>
+                        <tr>
+                            <th>Title</th>
+                            <th>Author</th>
+                            <th>ISBN</th>
+                            <th>Category</th>
+                            <th>Total</th>
+                            <th>Available</th>
+                            <th class="text-end">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var item in Model.Items)
+                        {
+                            <tr>
+                                <td>@item.Title</td>
+                                <td>@item.Author</td>
+                                <td>@item.ISBN</td>
+                                <td>@(Model.Categories.FirstOrDefault(c => c.Id == item.CategoryId)?.CategoryName ?? "—")</td>
+                                <td>@item.TotalQuantity</td>
+                                <td>@item.AvailableQuantity</td>
+                                <td class="text-end">
+                                    <button type="button" class="btn btn-sm btn-outline-primary"
+                                            data-id="@item.Id" data-title="@item.Title" data-author="@item.Author"
+                                            data-isbn="@item.ISBN" data-categoryid="@item.CategoryId" data-totalquantity="@item.TotalQuantity"
+                                            onclick="openEditModal(this.dataset)">
+                                        <i class="bi bi-pencil"></i>
+                                    </button>
+                                    <form asp-action="DeleteBook" method="post" class="d-inline" onsubmit="return confirm('Delete this book?');">
+                                        @Html.AntiForgeryToken()
+                                        <input type="hidden" name="id" value="@item.Id" />
+                                        <button type="submit" class="btn btn-sm btn-outline-danger"><i class="bi bi-trash"></i></button>
+                                    </form>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        }
+    </div>
+</div>
+
+<div class="modal fade" id="bookModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <form asp-action="SaveBook" method="post" class="modal-content">
+            @Html.AntiForgeryToken()
+            <div class="modal-header">
+                <h5 class="modal-title" id="bookModalTitle">Add Book</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <input type="hidden" asp-for="Form.Id" id="Form_Id" />
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        <label class="form-label">Title</label>
+                        <input asp-for="Form.Title" class="form-control" id="Form_Title" />
+                        <span asp-validation-for="Form.Title" class="text-danger small"></span>
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <label class="form-label">Author</label>
+                        <input asp-for="Form.Author" class="form-control" id="Form_Author" />
+                        <span asp-validation-for="Form.Author" class="text-danger small"></span>
+                    </div>
+                    <div class="col-md-4 mb-3">
+                        <label class="form-label">ISBN</label>
+                        <input asp-for="Form.ISBN" class="form-control" id="Form_ISBN" />
+                    </div>
+                    <div class="col-md-4 mb-3">
+                        <label class="form-label">Category</label>
+                        <select asp-for="Form.CategoryId" class="form-select" id="Form_CategoryId">
+                            <option value="">Select a category</option>
+                            @foreach (var c in Model.Categories)
+                            {
+                                <option value="@c.Id">@c.CategoryName</option>
+                            }
+                        </select>
+                        <span asp-validation-for="Form.CategoryId" class="text-danger small"></span>
+                    </div>
+                    <div class="col-md-4 mb-3">
+                        <label class="form-label">Total Quantity</label>
+                        <input asp-for="Form.TotalQuantity" type="number" class="form-control" id="Form_TotalQuantity" />
+                        <span asp-validation-for="Form.TotalQuantity" class="text-danger small"></span>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancel</button>
+                <button type="submit" class="btn btn-primary">Save</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<div class="modal fade" id="categoriesModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Manage Categories</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                @if (Model.Categories.Any())
+                {
+                    <ul class="list-group mb-3">
+                        @foreach (var c in Model.Categories)
+                        {
+                            <li class="list-group-item d-flex justify-content-between align-items-center">
+                                @c.CategoryName
+                                <span>
+                                    <button type="button" class="btn btn-sm btn-outline-primary"
+                                            data-id="@c.Id" data-categoryname="@c.CategoryName"
+                                            onclick="openEditCategory(this.dataset)">
+                                        <i class="bi bi-pencil"></i>
+                                    </button>
+                                    <form asp-action="DeleteCategory" method="post" class="d-inline" onsubmit="return confirm('Delete this category?');">
+                                        @Html.AntiForgeryToken()
+                                        <input type="hidden" name="id" value="@c.Id" />
+                                        <button type="submit" class="btn btn-sm btn-outline-danger"><i class="bi bi-trash"></i></button>
+                                    </form>
+                                </span>
+                            </li>
+                        }
+                    </ul>
+                }
+                <form asp-action="SaveCategory" method="post" class="d-flex gap-2">
+                    @Html.AntiForgeryToken()
+                    <input type="hidden" asp-for="CategoryForm.Id" id="CategoryForm_Id" />
+                    <input asp-for="CategoryForm.CategoryName" id="CategoryForm_CategoryName" class="form-control" placeholder="Category name" />
+                    <button type="submit" class="btn btn-primary text-nowrap" id="categorySubmitBtn">Add</button>
+                </form>
+                <span asp-validation-for="CategoryForm.CategoryName" class="text-danger small"></span>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+    <script>
+        const bookModal = new bootstrap.Modal(document.getElementById('bookModal'));
+        const categoryModal = new bootstrap.Modal(document.getElementById('categoriesModal'));
+
+        function openCreateModal() {
+            document.getElementById('bookModalTitle').innerText = 'Add Book';
+            document.getElementById('Form_Id').value = 0;
+            document.getElementById('Form_Title').value = '';
+            document.getElementById('Form_Author').value = '';
+            document.getElementById('Form_ISBN').value = '';
+            document.getElementById('Form_CategoryId').value = '';
+            document.getElementById('Form_TotalQuantity').value = '';
+            bookModal.show();
+        }
+
+        function openEditModal(data) {
+            document.getElementById('bookModalTitle').innerText = 'Edit Book';
+            document.getElementById('Form_Id').value = data.id;
+            document.getElementById('Form_Title').value = data.title;
+            document.getElementById('Form_Author').value = data.author;
+            document.getElementById('Form_ISBN').value = data.isbn;
+            document.getElementById('Form_CategoryId').value = data.categoryid;
+            document.getElementById('Form_TotalQuantity').value = data.totalquantity;
+            bookModal.show();
+        }
+
+        function openEditCategory(data) {
+            document.getElementById('CategoryForm_Id').value = data.id;
+            document.getElementById('CategoryForm_CategoryName').value = data.categoryname;
+            document.getElementById('categorySubmitBtn').innerText = 'Update';
+        }
+
+        @if (Model.ShowModal)
+        {
+            <text>window.addEventListener('DOMContentLoaded', () => bookModal.show());</text>
+        }
+        @if (Model.ShowCategoryModal)
+        {
+            <text>window.addEventListener('DOMContentLoaded', () => categoryModal.show());</text>
+        }
+    </script>
+}

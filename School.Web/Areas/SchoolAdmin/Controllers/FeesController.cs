@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using School.Application.DTOs.Fees;
+using School.Application.DTOs.Student;
 using School.Application.Interfaces;
 using School.Web.Models.Fees;
 
@@ -8,7 +9,7 @@ namespace School.Web.Areas.SchoolAdmin.Controllers;
 
 [Area("SchoolAdmin")]
 [Authorize(Roles = "SchoolAdmin")]
-public class FeesController(IFeesService feesSvc, IMastersService mastersSvc) : Controller
+public class FeesController(IFeesService feesSvc, IMastersService mastersSvc, IStudentService studentSvc) : Controller
 {
     public async Task<IActionResult> Index(int? classId, int? financialYearId, CancellationToken ct)
     {
@@ -55,6 +56,62 @@ public class FeesController(IFeesService feesSvc, IMastersService mastersSvc) : 
         await feesSvc.DeleteFeeMasterAsync(id, ct);
         TempData["Success"] = "Fee master deleted.";
         return RedirectToAction(nameof(Index), new { classId, financialYearId });
+    }
+
+    public async Task<IActionResult> ApplyToStudents(int feeMasterId, CancellationToken ct)
+    {
+        var feeMaster = await feesSvc.GetFeeMasterAsync(feeMasterId, ct);
+        if (feeMaster is null) return NotFound();
+
+        ViewData["Title"] = "Apply Fee";
+        return View(await BuildApplyViewModel(feeMaster, ct));
+    }
+
+    [HttpPost]
+    [ValidateAntiForgeryToken]
+    public async Task<IActionResult> Apply(ApplyFeeViewModel form, CancellationToken ct)
+    {
+        if (form.SelectedStudentIds.Count == 0)
+            ModelState.AddModelError(nameof(form.SelectedStudentIds), "Select at least one student");
+
+        if (!ModelState.IsValid)
+        {
+            var feeMaster = await feesSvc.GetFeeMasterAsync(form.FeeMasterId, ct);
+            if (feeMaster is null) return NotFound();
+
+            ViewData["Title"] = "Apply Fee";
+            var vm = await BuildApplyViewModel(feeMaster, ct);
+            vm.DueDate = form.DueDate;
+            vm.SelectedStudentIds = form.SelectedStudentIds;
+            return View("ApplyToStudents", vm);
+        }
+
+        await feesSvc.ApplyFeeToStudentsAsync(new ApplyFeeDto
+        {
+            StudentIds  = form.SelectedStudentIds,
+            FeeMasterId = form.FeeMasterId,
+            Amount      = form.Amount,
+            DueDate     = form.DueDate
+        }, ct);
+
+        TempData["Success"] = "Fee applied to selected students.";
+        return RedirectToAction(nameof(ApplyToStudents), new { feeMasterId = form.FeeMasterId });
+    }
+
+    private async Task<ApplyFeeViewModel> BuildApplyViewModel(FeeMasterDto feeMaster, CancellationToken ct)
+    {
+        var classes = await mastersSvc.GetClassesAsync(ct);
+        var students = await studentSvc.SearchAsync(new StudentSearchDto { ClassId = feeMaster.ClassId }, ct);
+
+        return new ApplyFeeViewModel
+        {
+            FeeMasterId = feeMaster.Id,
+            FeeName     = feeMaster.FeeName,
+            Amount      = feeMaster.Amount,
+            ClassId     = feeMaster.ClassId,
+            ClassName   = classes.FirstOrDefault(c => c.Id == feeMaster.ClassId)?.Name ?? "—",
+            Students    = students
+        };
     }
 
     private async Task<FeeMasterIndexViewModel> BuildViewModel(int? classId, int? financialYearId, CancellationToken ct)

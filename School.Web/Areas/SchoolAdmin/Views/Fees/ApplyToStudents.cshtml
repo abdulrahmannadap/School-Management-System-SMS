@@ -1,0 +1,97 @@
+@model School.Web.Models.Fees.ApplyFeeViewModel
+@{ ViewData["Title"] = "Apply Fee"; }
+
+@if (TempData["Success"] is string success)
+{
+    <div class="alert alert-success alert-dismissible fade show" role="alert">
+        @success
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    </div>
+}
+
+<div class="card border-0 shadow-sm mb-3">
+    <div class="card-body">
+        <h6 class="fw-semibold mb-3"><i class="bi bi-collection me-2 text-primary"></i>@Model.FeeName</h6>
+        <div class="row g-3">
+            <div class="col-sm-4">
+                <div class="text-muted small">Class</div>
+                <div class="fw-semibold">@Model.ClassName</div>
+            </div>
+            <div class="col-sm-4">
+                <div class="text-muted small">Amount</div>
+                <div class="fw-semibold">₹@Model.Amount.ToString("N2")</div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="card border-0 shadow-sm">
+    <div class="card-header bg-white border-0 pt-3">
+        <h6 class="mb-0 fw-semibold"><i class="bi bi-people-fill me-2 text-primary"></i>Apply to Students</h6>
+    </div>
+    <div class="card-body">
+        @if (!Model.Students.Any())
+        {
+            <div class="text-center text-muted py-5">
+                <i class="bi bi-people" style="font-size:2.5rem;opacity:.3"></i>
+                <p class="mt-2 mb-0">No students found in this class.</p>
+            </div>
+        }
+        else
+        {
+            <form asp-action="Apply" method="post">
+                @Html.AntiForgeryToken()
+                <input type="hidden" asp-for="FeeMasterId" />
+                <input type="hidden" asp-for="Amount" />
+                <input type="hidden" asp-for="ClassId" />
+
+                <div class="row g-3 align-items-end mb-3">
+                    <div class="col-sm-4">
+                        <label class="form-label">Due Date</label>
+                        <input asp-for="DueDate" type="date" class="form-control" />
+                        <span asp-validation-for="DueDate" class="text-danger small"></span>
+                    </div>
+                </div>
+
+                <span asp-validation-for="SelectedStudentIds" class="text-danger small d-block mb-2"></span>
+
+                <div class="table-responsive">
+                    <table class="table align-middle">
+                        <thead>
+                            <tr>
+                                <th style="width:40px"><input type="checkbox" id="selectAll" class="form-check-input" /></th>
+                                <th>GR No.</th>
+                                <th>Name</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var s in Model.Students)
+                            {
+                                <tr>
+                                    <td>
+                                        <input type="checkbox" name="SelectedStudentIds" value="@s.Id" class="form-check-input student-checkbox"
+                                               checked="@(Model.SelectedStudentIds.Contains(s.Id))" />
+                                    </td>
+                                    <td>@s.GRNumber</td>
+                                    <td>@s.FullName</td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+
+                <button type="submit" class="btn btn-primary"><i class="bi bi-check2-circle me-1"></i>Apply Fee</button>
+                <a asp-action="Index" asp-route-classId="@Model.ClassId" class="btn btn-outline-secondary">Back to Fee Master</a>
+            </form>
+        }
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+    <script>
+        document.getElementById('selectAll')?.addEventListener('change', function () {
+            document.querySelectorAll('.student-checkbox').forEach(cb => cb.checked = this.checked);
+        });
+    </script>
+}

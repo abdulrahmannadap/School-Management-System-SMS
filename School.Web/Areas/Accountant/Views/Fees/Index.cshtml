@@ -1,0 +1,72 @@
+@model School.Web.Models.Fees.CollectFeeSearchViewModel
+@{ ViewData["Title"] = "Collect Fee"; }
+
+<div class="card border-0 shadow-sm mb-3">
+    <div class="card-body">
+        <form method="get" class="row g-2 align-items-end">
+            <div class="col-sm-4">
+                <label class="form-label small">Name</label>
+                <input type="text" name="Name" value="@Model.Search.Name" class="form-control form-control-sm" />
+            </div>
+            <div class="col-sm-4">
+                <label class="form-label small">GR Number</label>
+                <input type="text" name="GRNumber" value="@Model.Search.GRNumber" class="form-control form-control-sm" />
+            </div>
+            <div class="col-sm-4">
+                <button type="submit" class="btn btn-sm btn-outline-primary"><i class="bi bi-search me-1"></i>Search</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<div class="card border-0 shadow-sm">
+    <div class="card-header bg-white border-0 pt-3">
+        <h6 class="mb-0 fw-semibold"><i class="bi bi-cash-stack me-2 text-primary"></i>Search Results</h6>
+    </div>
+    <div class="card-body">
+        @if (string.IsNullOrWhiteSpace(Model.Search.Name) && string.IsNullOrWhiteSpace(Model.Search.GRNumber))
+        {
+            <div class="text-center text-muted py-5">
+                <i class="bi bi-search" style="font-size:2.5rem;opacity:.3"></i>
+                <p class="mt-2 mb-0">Search by Name or GR Number to find a student and collect fees.</p>
+            </div>
+        }
+        else if (!Model.Results.Any())
+        {
+            <div class="text-center text-muted py-5">
+                <i class="bi bi-person-x" style="font-size:2.5rem;opacity:.3"></i>
+                <p class="mt-2 mb-0">No students found</p>
+            </div>
+        }
+        else
+        {
+            <div class="table-responsive">
+                <table class="table align-middle">
+                    <thead>
+                        <tr>
+                            <th>GR No.</th>
+                            <th>Name</th>
+                            <th>Gender</th>
+                            <th class="text-end">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var s in Model.Results)
+                        {
+                            <tr>
+                                <td>@s.GRNumber</td>
+                                <td>@s.FullName</td>
+                                <td>@s.Gender</td>
+                                <td class="text-end">
+                                    <a asp-action="Collect" asp-route-studentId="@s.Id" class="btn btn-sm btn-primary">
+                                        <i class="bi bi-cash-coin me-1"></i>Collect
+                                    </a>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        }
+    </div>
+</div>

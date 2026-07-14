@@ -8,7 +8,7 @@ namespace School.Web.Areas.SchoolAdmin.Controllers;
 
 [Area("SchoolAdmin")]
 [Authorize(Roles = "SchoolAdmin")]
-public class ExamController(IExamService examSvc, IMastersService mastersSvc) : Controller
+public class ExamController(IExamService examSvc, IMastersService mastersSvc, IStudentService studentSvc) : Controller
 {
     public async Task<IActionResult> Index(int? financialYearId, CancellationToken ct)
     {
@@ -149,6 +149,54 @@ public class ExamController(IExamService examSvc, IMastersService mastersSvc) : 
         {
             vm.Subjects = await mastersSvc.GetSubjectsAsync(classId, ct);
             vm.Items    = await examSvc.GetExamDetailsAsync(examId, classId.Value, ct);
+        }
+
+        return vm;
+    }
+
+    // ── Results ──────────────────────────────────────────────
+
+    public async Task<IActionResult> Results(int examId, int? classId, CancellationToken ct)
+    {
+        var exam = await examSvc.GetExamAsync(examId, ct);
+        if (exam is null) return NotFound();
+
+        ViewData["Title"] = "Results";
+        return View(await BuildResultsViewModel(exam.Id, exam.ExamName, classId, ct));
+    }
+
+    [HttpPost]
+    [ValidateAntiForgeryToken]
+    public async Task<IActionResult> Generate(int examId, int classId, CancellationToken ct)
+    {
+        await examSvc.GenerateResultAsync(new GenerateResultDto { ExamId = examId, ClassId = classId }, ct);
+        TempData["Success"] = "Results generated.";
+        return RedirectToAction(nameof(Results), new { examId, classId });
+    }
+
+    private async Task<ExamResultsViewModel> BuildResultsViewModel(int examId, string examName, int? classId, CancellationToken ct)
+    {
+        var vm = new ExamResultsViewModel
+        {
+            ExamId          = examId,
+            ExamName        = examName,
+            Classes         = await mastersSvc.GetClassesAsync(ct),
+            SelectedClassId = classId
+        };
+
+        if (classId.HasValue)
+        {
+            vm.Summary = await examSvc.GetClassResultAsync(examId, classId.Value, ct);
+            vm.Results = await examSvc.GetAllResultsAsync(examId, classId.Value, ct);
+
+            var names = new Dictionary<int, string>();
+            foreach (var result in vm.Results)
+            {
+                var student = await studentSvc.GetAsync(result.StudentId, ct);
+                if (student is not null)
+                    names[result.StudentId] = $"{student.FullName} ({student.GRNumber})";
+            }
+            vm.StudentNames = names;
         }
 
         return vm;

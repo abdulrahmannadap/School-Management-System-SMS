@@ -92,6 +92,9 @@
                                     <a asp-action="Details" asp-route-examId="@item.Id" class="btn btn-sm btn-outline-info" title="Subject Schedule">
                                         <i class="bi bi-list-ul"></i>
                                     </a>
+                                    <a asp-action="Results" asp-route-examId="@item.Id" class="btn btn-sm btn-outline-warning" title="Results">
+                                        <i class="bi bi-award"></i>
+                                    </a>
                                     <form asp-action="Publish" method="post" class="d-inline">
                                         @Html.AntiForgeryToken()
                                         <input type="hidden" name="id" value="@item.Id" />

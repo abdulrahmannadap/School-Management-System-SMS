@@ -1,6 +1,3 @@
-using System.Security.Claims;
-using System.Security.Cryptography;
-using System.Text;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Mvc;
@@ -9,6 +6,9 @@ using School.Application.Interfaces;
 using School.Domain.Enums;
 using School.Persistence;
 using School.Web.Models;
+using System.Security.Claims;
+using System.Security.Cryptography;
+using System.Text;
 
 namespace School.Web.Controllers;
 
@@ -49,7 +49,7 @@ public class AccountController(AppDbContext db, IJwtService jwtService) : Contro
             new("jwt",                     jwt),
         };
 
-        var identity  = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
+        var identity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
         var principal = new ClaimsPrincipal(identity);
 
         await HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, principal,
@@ -78,14 +78,14 @@ public class AccountController(AppDbContext db, IJwtService jwtService) : Contro
 
         return r switch
         {
-            nameof(UserRole.SuperAdmin)  => RedirectToAction("Index", "Home", new { area = "SuperAdmin" }),
+            nameof(UserRole.SuperAdmin) => RedirectToAction("Index", "Home", new { area = "SuperAdmin" }),
             nameof(UserRole.SchoolAdmin) => RedirectToAction("Index", "Home", new { area = "SchoolAdmin" }),
-            nameof(UserRole.Teacher)     => RedirectToAction("Index", "Home", new { area = "Teacher" }),
-            nameof(UserRole.Accountant)  => RedirectToAction("Index", "Home", new { area = "Accountant" }),
-            nameof(UserRole.Staff)       => RedirectToAction("Index", "Home", new { area = "Staff" }),
-            nameof(UserRole.Parent)      => RedirectToAction("Index", "Home", new { area = "Parent" }),
-            nameof(UserRole.Student)     => RedirectToAction("Index", "Home", new { area = "Student" }),
-            _                            => RedirectToAction(nameof(Login)),
+            nameof(UserRole.Teacher) => RedirectToAction("Index", "Home", new { area = "Teacher" }),
+            nameof(UserRole.Accountant) => RedirectToAction("Index", "Home", new { area = "Accountant" }),
+            nameof(UserRole.Staff) => RedirectToAction("Index", "Home", new { area = "Staff" }),
+            nameof(UserRole.Parent) => RedirectToAction("Index", "Home", new { area = "Parent" }),
+            nameof(UserRole.Student) => RedirectToAction("Index", "Home", new { area = "Student" }),
+            _ => RedirectToAction(nameof(Login)),
         };
     }
 

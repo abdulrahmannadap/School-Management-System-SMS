@@ -97,6 +97,16 @@
             .main-wrapper { margin-left: 0; }
             .topbar .btn-toggle { display: block; }
         }
+        .brand-logo {
+    width: 48px;
+    height: 48px;
+    object-fit: contain;
+    border-radius: 50%;
+    background: #fff;
+    padding: 3px;
+}
+
+
     </style>
     @await RenderSectionAsync("Styles", required: false)
 </head>
@@ -109,7 +119,9 @@
 <nav id="sidebar" class="sidebar">
 
     <a class="sidebar-brand" href="#">
-        <i class="bi bi-mortarboard-fill"></i>
+        @* <i class="bi bi-mortarboard-fill"></i> *@
+<img src="~/images/logo_ii.jpeg" asp-append-version="true" alt="Wisdom Academy Logo" class="brand-logo" />
+
         <div>
             <div class="brand-name">Wisdom Academy</div>
             <div class="brand-sub">School Management</div>
@@ -289,10 +301,12 @@
                     <i class="bi bi-chevron-down chevron"></i>
                 </a>
                 <ul class="collapse sub-nav list-unstyled" id="adm-masters">
-                    <li><a class="nav-link" href="#"><i class="bi bi-calendar3 nav-icon"></i> Academic Year</a></li>
-                    <li><a class="nav-link" href="#"><i class="bi bi-grid nav-icon"></i> Classes</a></li>
-                    <li><a class="nav-link" href="#"><i class="bi bi-diagram-3 nav-icon"></i> Divisions</a></li>
-                    <li><a class="nav-link" href="#"><i class="bi bi-journal nav-icon"></i> Subjects</a></li>
+                    <li><a class="nav-link" asp-area="SchoolAdmin" asp-controller="Masters" asp-action="AcademicYears"><i class="bi bi-calendar3 nav-icon"></i> Academic Year</a></li>
+                    <li><a class="nav-link" asp-area="SchoolAdmin" asp-controller="Masters" asp-action="FinancialYears"><i class="bi bi-calendar-week nav-icon"></i> Financial Year</a></li>
+                    <li><a class="nav-link" asp-area="SchoolAdmin" asp-controller="Masters" asp-action="Classes"><i class="bi bi-grid nav-icon"></i> Classes</a></li>
+                    <li><a class="nav-link" asp-area="SchoolAdmin" asp-controller="Masters" asp-action="Divisions"><i class="bi bi-diagram-3 nav-icon"></i> Divisions</a></li>
+                    <li><a class="nav-link" asp-area="SchoolAdmin" asp-controller="Masters" asp-action="Batches"><i class="bi bi-collection nav-icon"></i> Batches</a></li>
+                    <li><a class="nav-link" asp-area="SchoolAdmin" asp-controller="Masters" asp-action="Subjects"><i class="bi bi-journal nav-icon"></i> Subjects</a></li>
                     <li><a class="nav-link" href="#"><i class="bi bi-flag nav-icon"></i> Holidays</a></li>
                 </ul>
             </li>
@@ -651,7 +665,7 @@
                 <li><h6 class="dropdown-header">@User.Identity?.Name</h6></li>
                 <li><hr class="dropdown-divider"></li>
                 <li>
-                    <form asp-controller="Account" asp-action="Logout" method="post" class="d-inline">
+                    <form asp-area="" asp-controller="Account" asp-action="Logout" method="post" class="d-inline">
                         @Html.AntiForgeryToken()
                         <button type="submit" class="dropdown-item text-danger">
                             <i class="bi bi-box-arrow-right me-2"></i>Logout

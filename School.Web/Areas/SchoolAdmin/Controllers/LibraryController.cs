@@ -8,12 +8,28 @@ namespace School.Web.Areas.SchoolAdmin.Controllers;
 
 [Area("SchoolAdmin")]
 [Authorize(Roles = "SchoolAdmin")]
-public class LibraryController(ILibraryService librarySvc) : Controller
+public class LibraryController(ILibraryService librarySvc, IBookAggregatorService aggregatorSvc) : Controller
 {
     public async Task<IActionResult> Books([FromQuery] BookSearchDto search, CancellationToken ct)
     {
         ViewData["Title"] = "Books";
         return View(await BuildViewModel(search, ct));
+    }
+
+    public async Task<IActionResult> SearchOnline(string? query, CancellationToken ct)
+    {
+        ViewData["Title"] = "Search Online";
+
+        var vm = new SearchOnlineViewModel { Query = query };
+
+        if (!string.IsNullOrWhiteSpace(query))
+        {
+            var result = await aggregatorSvc.SearchAsync(query, ct);
+            vm.Results = result.Results;
+            vm.Warnings = result.Warnings;
+        }
+
+        return View(vm);
     }
 
     [HttpPost]

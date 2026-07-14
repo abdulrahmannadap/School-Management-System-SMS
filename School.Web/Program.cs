@@ -20,6 +20,7 @@ builder.Services.AddScoped<IStudentService, StudentService>();
 builder.Services.AddScoped<IStaffService, StaffService>();
 builder.Services.AddScoped<IFeesService, FeesService>();
 builder.Services.AddScoped<ILibraryService, LibraryService>();
+builder.Services.AddHttpClient<IBookAggregatorService, BookAggregatorService>();
 
 builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
     .AddCookie(o =>

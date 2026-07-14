@@ -1,6 +1,8 @@
 @model School.Web.Models.Library.BooksIndexViewModel
 @{ ViewData["Title"] = "Books"; }
 
+<div id="prefillData" data-title="@Context.Request.Query["prefillTitle"]" data-author="@Context.Request.Query["prefillAuthor"]" hidden></div>
+
 @if (TempData["Success"] is string success)
 {
     <div class="alert alert-success alert-dismissible fade show" role="alert">
@@ -42,6 +44,9 @@
     <div class="card-header bg-white border-0 pt-3 d-flex justify-content-between align-items-center">
         <h6 class="mb-0 fw-semibold"><i class="bi bi-bookshelf me-2 text-primary"></i>Books</h6>
         <div class="d-flex gap-2">
+            <a asp-action="SearchOnline" class="btn btn-sm btn-outline-success">
+                <i class="bi bi-globe me-1"></i>Search Online
+            </a>
             <button type="button" class="btn btn-sm btn-outline-secondary" onclick="categoryModal.show()">
                 <i class="bi bi-tags me-1"></i>Manage Categories
             </button>
@@ -250,6 +255,18 @@
         @if (Model.ShowCategoryModal)
         {
             <text>window.addEventListener('DOMContentLoaded', () => categoryModal.show());</text>
+        }
+
+        @if (!string.IsNullOrEmpty(Context.Request.Query["prefillTitle"]) || !string.IsNullOrEmpty(Context.Request.Query["prefillAuthor"]))
+        {
+            <text>
+            window.addEventListener('DOMContentLoaded', () => {
+                const prefill = document.getElementById('prefillData').dataset;
+                openCreateModal();
+                document.getElementById('Form_Title').value = prefill.title || '';
+                document.getElementById('Form_Author').value = prefill.author || '';
+            });
+            </text>
         }
     </script>
 }

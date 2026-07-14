@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Authentication.Cookies;
 using School.Application.Interfaces;
 using School.Application.Services.Masters;
+using School.Application.Services.Student;
 using School.Infrastructure.Services;
 using School.Persistence;
 
@@ -12,6 +13,7 @@ builder.Services.AddPersistence(builder.Configuration);
 
 builder.Services.AddScoped<IJwtService, JwtService>();
 builder.Services.AddScoped<IMastersService, MastersService>();
+builder.Services.AddScoped<IStudentService, StudentService>();
 
 builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
     .AddCookie(o =>

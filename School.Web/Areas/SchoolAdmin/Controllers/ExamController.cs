@@ -78,4 +78,79 @@ public class ExamController(IExamService examSvc, IMastersService mastersSvc) : 
 
         return vm;
     }
+
+    // ── Exam Detail (subject schedule) ──────────────────────────
+
+    public async Task<IActionResult> Details(int examId, int? classId, CancellationToken ct)
+    {
+        var exam = await examSvc.GetExamAsync(examId, ct);
+        if (exam is null) return NotFound();
+
+        ViewData["Title"] = "Subject Schedule";
+        return View(await BuildDetailsViewModel(exam.Id, exam.ExamName, classId, ct));
+    }
+
+    [HttpPost]
+    [ValidateAntiForgeryToken]
+    public async Task<IActionResult> SaveDetail(ExamDetailFormModel form, CancellationToken ct)
+    {
+        if (!ModelState.IsValid)
+        {
+            var exam = await examSvc.GetExamAsync(form.ExamId, ct);
+            if (exam is null) return NotFound();
+
+            ViewData["Title"] = "Subject Schedule";
+            var vm = await BuildDetailsViewModel(exam.Id, exam.ExamName, form.ClassId, ct);
+            vm.Form = form;
+            vm.ShowModal = true;
+            return View("Details", vm);
+        }
+
+        var dto = new ExamDetailDto
+        {
+            Id           = form.Id,
+            ExamId       = form.ExamId,
+            ClassId      = form.ClassId,
+            SubjectId    = form.SubjectId,
+            MaxMarks     = form.MaxMarks,
+            PassingMarks = form.PassingMarks,
+            ExamDate     = form.ExamDate
+        };
+
+        if (form.Id == 0)
+            await examSvc.AddExamDetailAsync(dto, ct);
+        else
+            await examSvc.UpdateExamDetailAsync(dto, ct);
+
+        TempData["Success"] = "Subject schedule saved.";
+        return RedirectToAction(nameof(Details), new { examId = form.ExamId, classId = form.ClassId });
+    }
+
+    [HttpPost]
+    [ValidateAntiForgeryToken]
+    public async Task<IActionResult> DeleteDetail(int id, int examId, int classId, CancellationToken ct)
+    {
+        await examSvc.DeleteExamDetailAsync(id, ct);
+        TempData["Success"] = "Subject schedule entry deleted.";
+        return RedirectToAction(nameof(Details), new { examId, classId });
+    }
+
+    private async Task<ExamDetailsViewModel> BuildDetailsViewModel(int examId, string examName, int? classId, CancellationToken ct)
+    {
+        var vm = new ExamDetailsViewModel
+        {
+            ExamId          = examId,
+            ExamName        = examName,
+            Classes         = await mastersSvc.GetClassesAsync(ct),
+            SelectedClassId = classId
+        };
+
+        if (classId.HasValue)
+        {
+            vm.Subjects = await mastersSvc.GetSubjectsAsync(classId, ct);
+            vm.Items    = await examSvc.GetExamDetailsAsync(examId, classId.Value, ct);
+        }
+
+        return vm;
+    }
 }

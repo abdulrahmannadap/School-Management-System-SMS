@@ -1,0 +1,147 @@
+@model School.Web.Models.Marks.MarksEntryViewModel
+@{ ViewData["Title"] = "Marks Entry"; }
+
+@if (TempData["Success"] is string success)
+{
+    <div class="alert alert-success alert-dismissible fade show" role="alert">
+        @success
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    </div>
+}
+
+<div class="card border-0 shadow-sm mb-3">
+    <div class="card-body">
+        <form method="get" class="row g-2 align-items-end">
+            <div class="col-sm-3">
+                <label class="form-label small">Financial Year</label>
+                <select name="financialYearId" class="form-select form-select-sm" onchange="this.form.submit()">
+                    <option value="">Select FY</option>
+                    @foreach (var fy in Model.FinancialYears)
+                    {
+                        <option value="@fy.Id" selected="@(Model.FinancialYearId == fy.Id)">@fy.Name</option>
+                    }
+                </select>
+            </div>
+            <div class="col-sm-3">
+                <label class="form-label small">Exam</label>
+                <select name="examId" class="form-select form-select-sm" onchange="this.form.submit()">
+                    <option value="">Select Exam</option>
+                    @foreach (var e in Model.Exams)
+                    {
+                        <option value="@e.Id" selected="@(Model.ExamId == e.Id)">@e.ExamName</option>
+                    }
+                </select>
+            </div>
+            <div class="col-sm-3">
+                <label class="form-label small">Class</label>
+                <select name="classId" class="form-select form-select-sm" onchange="this.form.submit()">
+                    <option value="">Select Class</option>
+                    @foreach (var c in Model.Classes)
+                    {
+                        <option value="@c.Id" selected="@(Model.ClassId == c.Id)">@c.Name</option>
+                    }
+                </select>
+            </div>
+            <div class="col-sm-3">
+                <label class="form-label small">Subject</label>
+                <select name="subjectId" class="form-select form-select-sm" onchange="this.form.submit()">
+                    <option value="">Select Subject</option>
+                    @foreach (var s in Model.Subjects)
+                    {
+                        <option value="@s.Id" selected="@(Model.SubjectId == s.Id)">@s.Name</option>
+                    }
+                </select>
+            </div>
+        </form>
+    </div>
+</div>
+
+<div class="card border-0 shadow-sm">
+    <div class="card-header bg-white border-0 pt-3">
+        <h6 class="mb-0 fw-semibold">
+            <i class="bi bi-pencil-square me-2 text-primary"></i>Roster
+            @if (Model.MaxMarks.HasValue)
+            {
+                <span class="text-muted small">(out of @Model.MaxMarks, passing @Model.PassingMarks)</span>
+            }
+        </h6>
+    </div>
+    <div class="card-body">
+        @if (!Model.FinancialYearId.HasValue || !Model.ExamId.HasValue || !Model.ClassId.HasValue || !Model.SubjectId.HasValue)
+        {
+            <div class="text-center text-muted py-5">
+                <i class="bi bi-funnel" style="font-size:2.5rem;opacity:.3"></i>
+                <p class="mt-2 mb-0">Select Financial Year, Exam, Class, and Subject to load the roster.</p>
+            </div>
+        }
+        else if (!Model.Rows.Any())
+        {
+            <div class="text-center text-muted py-5">
+                <i class="bi bi-people" style="font-size:2.5rem;opacity:.3"></i>
+                <p class="mt-2 mb-0">No students found in this class.</p>
+            </div>
+        }
+        else
+        {
+            <form asp-action="Save" method="post">
+                @Html.AntiForgeryToken()
+                <input type="hidden" asp-for="FinancialYearId" />
+                <input type="hidden" asp-for="ExamId" />
+                <input type="hidden" asp-for="ClassId" />
+                <input type="hidden" asp-for="SubjectId" />
+
+                <div class="table-responsive">
+                    <table class="table align-middle">
+                        <thead>
+                            <tr>
+                                <th>GR No.</th>
+                                <th>Name</th>
+                                <th>Marks Obtained</th>
+                                <th>Absent</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @for (var i = 0; i < Model.Rows.Count; i++)
+                            {
+                                <tr>
+                                    <td>@Model.Rows[i].GRNumber</td>
+                                    <td>
+                                        @Model.Rows[i].StudentName
+                                        <input type="hidden" asp-for="Rows[i].StudentId" />
+                                        <input type="hidden" asp-for="Rows[i].StudentName" />
+                                        <input type="hidden" asp-for="Rows[i].GRNumber" />
+                                    </td>
+                                    <td>
+                                        <input asp-for="Rows[i].MarksObtained" type="number" step="0.01"
+                                               max="@Model.MaxMarks" class="form-control form-control-sm marks-input" style="width:100px" />
+                                    </td>
+                                    <td>
+                                        <input asp-for="Rows[i].IsAbsent" class="form-check-input absent-check" />
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+
+                <button type="submit" class="btn btn-primary"><i class="bi bi-check2-circle me-1"></i>Save Marks</button>
+            </form>
+        }
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+    <script>
+        document.querySelectorAll('.absent-check').forEach(cb => {
+            const row = cb.closest('tr');
+            const marksInput = row.querySelector('.marks-input');
+            const sync = () => {
+                marksInput.disabled = cb.checked;
+                if (cb.checked) marksInput.value = 0;
+            };
+            cb.addEventListener('change', sync);
+            sync();
+        });
+    </script>
+}

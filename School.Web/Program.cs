@@ -5,18 +5,22 @@ using School.Application.Services.Fees;
 using School.Application.Services.Inventory;
 using School.Application.Services.Library;
 using School.Application.Services.Masters;
+using School.Application.Services;
 using School.Application.Services.Portal;
 using School.Application.Services.Staff;
 using School.Application.Services.Student;
 using School.Infrastructure.Services;
 using School.Persistence;
+using School.Web.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddControllersWithViews();
+builder.Services.AddHttpContextAccessor();
 
 builder.Services.AddPersistence(builder.Configuration);
 
+builder.Services.AddScoped<ICurrentSchoolContext, CurrentSchoolContext>();
 builder.Services.AddScoped<IJwtService, JwtService>();
 builder.Services.AddScoped<IMastersService, MastersService>();
 builder.Services.AddScoped<IStudentService, StudentService>();
@@ -26,6 +30,7 @@ builder.Services.AddScoped<ILibraryService, LibraryService>();
 builder.Services.AddScoped<IInventoryService, InventoryService>();
 builder.Services.AddScoped<IExamService, ExamService>();
 builder.Services.AddScoped<IPortalAccountService, PortalAccountService>();
+builder.Services.AddScoped<ISchoolService, SchoolService>();
 builder.Services.AddHttpClient<IBookAggregatorService, BookAggregatorService>();
 
 builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)

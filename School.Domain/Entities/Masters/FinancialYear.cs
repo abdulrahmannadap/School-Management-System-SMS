@@ -1,7 +1,10 @@
+using School.Domain.Common;
+
 namespace School.Domain.Entities.Masters;
 
-public class FinancialYear
+public class FinancialYear : ITenantEntity
 {
+    public Guid SchoolId { get; set; }
     public int    Id        { get; set; }
     public string Name      { get; set; } = string.Empty;
     public DateTime StartDate { get; set; }

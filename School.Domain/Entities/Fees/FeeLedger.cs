@@ -1,7 +1,10 @@
+using School.Domain.Common;
+
 namespace School.Domain.Entities.Fees;
 
-public class FeeLedger
+public class FeeLedger : ITenantEntity
 {
+    public Guid SchoolId { get; set; }
     public int      Id          { get; set; }
     public int      StudentId   { get; set; }
     public int      FeeMasterId { get; set; }

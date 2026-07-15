@@ -1,7 +1,10 @@
+using School.Domain.Common;
+
 namespace School.Domain.Entities.Inventory;
 
-public class InventoryOrder
+public class InventoryOrder : ITenantEntity
 {
+    public Guid SchoolId { get; set; }
     public int      Id           { get; set; }
     public string   OrderNo      { get; set; } = string.Empty;
     public DateTime Date         { get; set; }

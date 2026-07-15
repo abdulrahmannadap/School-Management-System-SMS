@@ -89,11 +89,12 @@ public class StudentService(
         await userRepo.AddAsync(new User
         {
             FullName     = entity.FullName,
-            Email        = $"{entity.GRNumber}@student.local",
+            Email        = $"student{entity.Id}@student.local",
             PasswordHash = PasswordHasher.Hash(entity.GRNumber),
             Role         = UserRole.Student,
             IsActive     = true,
-            StudentId    = entity.Id
+            StudentId    = entity.Id,
+            SchoolId     = entity.SchoolId
         }, ct);
         await userRepo.SaveChangesAsync(ct);
 

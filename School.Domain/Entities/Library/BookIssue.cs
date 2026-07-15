@@ -1,7 +1,10 @@
+using School.Domain.Common;
+
 namespace School.Domain.Entities.Library;
 
-public class BookIssue
+public class BookIssue : ITenantEntity
 {
+    public Guid SchoolId { get; set; }
     public int      Id        { get; set; }
     public int      BookId    { get; set; }
     public int?     StudentId { get; set; }

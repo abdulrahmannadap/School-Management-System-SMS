@@ -1,7 +1,10 @@
+using School.Domain.Common;
+
 namespace School.Domain.Entities.Fees;
 
-public class Voucher
+public class Voucher : ITenantEntity
 {
+    public Guid SchoolId { get; set; }
     public int      Id          { get; set; }
     public DateTime Date        { get; set; }
     public string   Type        { get; set; } = string.Empty;

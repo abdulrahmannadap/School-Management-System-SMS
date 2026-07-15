@@ -37,6 +37,9 @@ namespace School.Persistence.Migrations
                     b.Property<int>("ExamId")
                         .HasColumnType("int");
 
+                    b.Property<Guid>("SchoolId")
+                        .HasColumnType("uniqueidentifier");
+
                     b.HasKey("Id");
 
                     b.ToTable("ExamCategoryMaps");
@@ -67,6 +70,9 @@ namespace School.Persistence.Migrations
                         .HasPrecision(18, 2)
                         .HasColumnType("decimal(18,2)");
 
+                    b.Property<Guid>("SchoolId")
+                        .HasColumnType("uniqueidentifier");
+
                     b.Property<int>("SubjectId")
                         .HasColumnType("int");
 
@@ -89,6 +95,9 @@ namespace School.Persistence.Migrations
                     b.Property<string>("GroupName")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
+
+                    b.Property<Guid>("SchoolId")
+                        .HasColumnType("uniqueidentifier");
 
                     b.HasKey("Id");
 
@@ -116,6 +125,9 @@ namespace School.Persistence.Migrations
                     b.Property<bool>("IsPublished")
                         .HasColumnType("bit");
 
+                    b.Property<Guid>("SchoolId")
+                        .HasColumnType("uniqueidentifier");
+
                     b.Property<DateTime>("StartDate")
                         .HasColumnType("datetime2");
 
@@ -138,6 +150,9 @@ namespace School.Persistence.Migrations
                     b.Property<string>("Remark")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
+
+                    b.Property<Guid>("SchoolId")
+                        .HasColumnType("uniqueidentifier");
 
                     b.Property<int>("StudentId")
                         .HasColumnType("int");
@@ -169,6 +184,9 @@ namespace School.Persistence.Migrations
                         .HasPrecision(18, 2)
                         .HasColumnType("decimal(18,2)");
 
+                    b.Property<Guid>("SchoolId")
+                        .HasColumnType("uniqueidentifier");
+
                     b.Property<int>("StudentId")
                         .HasColumnType("int");
 
@@ -191,6 +209,9 @@ namespace School.Persistence.Migrations
 
                     b.Property<int>("ExamId")
                         .HasColumnType("int");
+
+                    b.Property<Guid>("SchoolId")
+                        .HasColumnType("uniqueidentifier");
 
                     b.Property<string>("SeatNumber")
                         .IsRequired()
@@ -218,6 +239,9 @@ namespace School.Persistence.Migrations
                     b.Property<decimal>("GraceMarks")
                         .HasPrecision(18, 2)
                         .HasColumnType("decimal(18,2)");
+
+                    b.Property<Guid>("SchoolId")
+                        .HasColumnType("uniqueidentifier");
 
                     b.Property<int>("StudentId")
                         .HasColumnType("int");
@@ -247,6 +271,9 @@ namespace School.Persistence.Migrations
                     b.Property<decimal>("MarksObtained")
                         .HasPrecision(18, 2)
                         .HasColumnType("decimal(18,2)");
+
+                    b.Property<Guid>("SchoolId")
+                        .HasColumnType("uniqueidentifier");
 
                     b.Property<int>("StudentId")
                         .HasColumnType("int");
@@ -294,6 +321,9 @@ namespace School.Persistence.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<Guid>("SchoolId")
+                        .HasColumnType("uniqueidentifier");
+
                     b.Property<int>("SubjectId")
                         .HasColumnType("int");
 
@@ -312,6 +342,9 @@ namespace School.Persistence.Migrations
 
                     b.Property<int>("McqId")
                         .HasColumnType("int");
+
+                    b.Property<Guid>("SchoolId")
+                        .HasColumnType("uniqueidentifier");
 
                     b.Property<string>("SelectedAnswer")
                         .IsRequired()
@@ -347,6 +380,9 @@ namespace School.Persistence.Migrations
                     b.Property<bool>("IsCleared")
                         .HasColumnType("bit");
 
+                    b.Property<Guid>("SchoolId")
+                        .HasColumnType("uniqueidentifier");
+
                     b.Property<int>("StudentId")
                         .HasColumnType("int");
 
@@ -374,6 +410,9 @@ namespace School.Persistence.Migrations
                     b.Property<int>("ClassId")
                         .HasColumnType("int");
 
+                    b.Property<Guid>("SchoolId")
+                        .HasColumnType("uniqueidentifier");
+
                     b.HasKey("Id");
 
                     b.ToTable("ClassBankMappings");
@@ -394,6 +433,9 @@ namespace School.Persistence.Migrations
                     b.Property<string>("DepositName")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
+
+                    b.Property<Guid>("SchoolId")
+                        .HasColumnType("uniqueidentifier");
 
                     b.HasKey("Id");
 
@@ -417,6 +459,9 @@ namespace School.Persistence.Migrations
 
                     b.Property<int>("DepositMasterId")
                         .HasColumnType("int");
+
+                    b.Property<Guid>("SchoolId")
+                        .HasColumnType("uniqueidentifier");
 
                     b.Property<int>("StudentId")
                         .HasColumnType("int");
@@ -448,6 +493,9 @@ namespace School.Persistence.Migrations
                     b.Property<int>("FeeMasterId")
                         .HasColumnType("int");
 
+                    b.Property<Guid>("SchoolId")
+                        .HasColumnType("uniqueidentifier");
+
                     b.Property<int>("StudentId")
                         .HasColumnType("int");
 
@@ -471,6 +519,9 @@ namespace School.Persistence.Migrations
                     b.Property<string>("Reason")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
+
+                    b.Property<Guid>("SchoolId")
+                        .HasColumnType("uniqueidentifier");
 
                     b.Property<int>("StudentId")
                         .HasColumnType("int");
@@ -505,6 +556,9 @@ namespace School.Persistence.Migrations
                     b.Property<string>("ReferenceNo")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
+
+                    b.Property<Guid>("SchoolId")
+                        .HasColumnType("uniqueidentifier");
 
                     b.Property<int>("StudentId")
                         .HasColumnType("int");
@@ -543,6 +597,9 @@ namespace School.Persistence.Migrations
                     b.Property<bool>("IsRecurring")
                         .HasColumnType("bit");
 
+                    b.Property<Guid>("SchoolId")
+                        .HasColumnType("uniqueidentifier");
+
                     b.HasKey("Id");
 
                     b.ToTable("FeeMasters");
@@ -571,6 +628,9 @@ namespace School.Persistence.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<Guid>("SchoolId")
+                        .HasColumnType("uniqueidentifier");
+
                     b.Property<int>("StudentId")
                         .HasColumnType("int");
 
@@ -597,6 +657,9 @@ namespace School.Persistence.Migrations
                     b.Property<string>("Reason")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
+
+                    b.Property<Guid>("SchoolId")
+                        .HasColumnType("uniqueidentifier");
 
                     b.Property<int>("StudentId")
                         .HasColumnType("int");
@@ -625,6 +688,9 @@ namespace School.Persistence.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<Guid>("SchoolId")
+                        .HasColumnType("uniqueidentifier");
+
                     b.Property<string>("Type")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
@@ -645,6 +711,9 @@ namespace School.Persistence.Migrations
                     b.Property<string>("Name")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
+
+                    b.Property<Guid>("SchoolId")
+                        .HasColumnType("uniqueidentifier");
 
                     b.HasKey("Id");
 
@@ -672,6 +741,9 @@ namespace School.Persistence.Migrations
                     b.Property<string>("PaymentMode")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
+
+                    b.Property<Guid>("SchoolId")
+                        .HasColumnType("uniqueidentifier");
 
                     b.HasKey("Id");
 
@@ -701,6 +773,9 @@ namespace School.Persistence.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<Guid>("SchoolId")
+                        .HasColumnType("uniqueidentifier");
+
                     b.HasKey("Id");
 
                     b.ToTable("Expenses");
@@ -724,6 +799,9 @@ namespace School.Persistence.Migrations
                     b.Property<string>("OrderNo")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
+
+                    b.Property<Guid>("SchoolId")
+                        .HasColumnType("uniqueidentifier");
 
                     b.Property<string>("Status")
                         .IsRequired()
@@ -760,6 +838,9 @@ namespace School.Persistence.Migrations
                     b.Property<decimal>("PendingAmount")
                         .HasPrecision(18, 2)
                         .HasColumnType("decimal(18,2)");
+
+                    b.Property<Guid>("SchoolId")
+                        .HasColumnType("uniqueidentifier");
 
                     b.Property<string>("Status")
                         .IsRequired()
@@ -800,6 +881,9 @@ namespace School.Persistence.Migrations
                         .HasPrecision(18, 2)
                         .HasColumnType("decimal(18,2)");
 
+                    b.Property<Guid>("SchoolId")
+                        .HasColumnType("uniqueidentifier");
+
                     b.HasKey("Id");
 
                     b.ToTable("InvoiceItems");
@@ -820,6 +904,9 @@ namespace School.Persistence.Migrations
                     b.Property<string>("Name")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
+
+                    b.Property<Guid>("SchoolId")
+                        .HasColumnType("uniqueidentifier");
 
                     b.HasKey("Id");
 
@@ -848,6 +935,9 @@ namespace School.Persistence.Migrations
                         .HasPrecision(18, 2)
                         .HasColumnType("decimal(18,2)");
 
+                    b.Property<Guid>("SchoolId")
+                        .HasColumnType("uniqueidentifier");
+
                     b.Property<decimal>("SellingPrice")
                         .HasPrecision(18, 2)
                         .HasColumnType("decimal(18,2)");
@@ -867,6 +957,9 @@ namespace School.Persistence.Migrations
 
                     b.Property<int>("ProductId")
                         .HasColumnType("int");
+
+                    b.Property<Guid>("SchoolId")
+                        .HasColumnType("uniqueidentifier");
 
                     b.Property<string>("Value")
                         .IsRequired()
@@ -907,6 +1000,9 @@ namespace School.Persistence.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<Guid>("SchoolId")
+                        .HasColumnType("uniqueidentifier");
+
                     b.Property<string>("Type")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
@@ -927,6 +1023,9 @@ namespace School.Persistence.Migrations
                     b.Property<string>("CategoryName")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
+
+                    b.Property<Guid>("SchoolId")
+                        .HasColumnType("uniqueidentifier");
 
                     b.HasKey("Id");
 
@@ -952,6 +1051,9 @@ namespace School.Persistence.Migrations
 
                     b.Property<DateTime>("IssueDate")
                         .HasColumnType("datetime2");
+
+                    b.Property<Guid>("SchoolId")
+                        .HasColumnType("uniqueidentifier");
 
                     b.Property<int?>("StaffId")
                         .HasColumnType("int");
@@ -980,6 +1082,9 @@ namespace School.Persistence.Migrations
 
                     b.Property<DateTime>("DueDate")
                         .HasColumnType("datetime2");
+
+                    b.Property<Guid>("SchoolId")
+                        .HasColumnType("uniqueidentifier");
 
                     b.Property<int?>("StaffId")
                         .HasColumnType("int");
@@ -1014,6 +1119,9 @@ namespace School.Persistence.Migrations
                     b.Property<DateTime>("ReturnDate")
                         .HasColumnType("datetime2");
 
+                    b.Property<Guid>("SchoolId")
+                        .HasColumnType("uniqueidentifier");
+
                     b.HasKey("Id");
 
                     b.ToTable("BookReturns");
@@ -1041,6 +1149,9 @@ namespace School.Persistence.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(450)");
 
+                    b.Property<Guid>("SchoolId")
+                        .HasColumnType("uniqueidentifier");
+
                     b.Property<string>("Title")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
@@ -1050,7 +1161,7 @@ namespace School.Persistence.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("ISBN")
+                    b.HasIndex("SchoolId", "ISBN")
                         .IsUnique();
 
                     b.ToTable("LibraryBooks");
@@ -1073,6 +1184,9 @@ namespace School.Persistence.Migrations
                     b.Property<string>("Name")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
+
+                    b.Property<Guid>("SchoolId")
+                        .HasColumnType("uniqueidentifier");
 
                     b.Property<DateTime>("StartDate")
                         .HasColumnType("datetime2");
@@ -1097,6 +1211,9 @@ namespace School.Persistence.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<Guid>("SchoolId")
+                        .HasColumnType("uniqueidentifier");
+
                     b.HasKey("Id");
 
                     b.ToTable("Batches");
@@ -1120,6 +1237,9 @@ namespace School.Persistence.Migrations
                     b.Property<int>("OrderNo")
                         .HasColumnType("int");
 
+                    b.Property<Guid>("SchoolId")
+                        .HasColumnType("uniqueidentifier");
+
                     b.HasKey("Id");
 
                     b.ToTable("Classes");
@@ -1139,6 +1259,9 @@ namespace School.Persistence.Migrations
                     b.Property<string>("Name")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
+
+                    b.Property<Guid>("SchoolId")
+                        .HasColumnType("uniqueidentifier");
 
                     b.HasKey("Id");
 
@@ -1162,6 +1285,9 @@ namespace School.Persistence.Migrations
                     b.Property<string>("Name")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
+
+                    b.Property<Guid>("SchoolId")
+                        .HasColumnType("uniqueidentifier");
 
                     b.Property<DateTime>("StartDate")
                         .HasColumnType("datetime2");
@@ -1189,9 +1315,45 @@ namespace School.Persistence.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<Guid>("SchoolId")
+                        .HasColumnType("uniqueidentifier");
+
                     b.HasKey("Id");
 
                     b.ToTable("Subjects");
+                });
+
+            modelBuilder.Entity("School.Domain.Entities.School", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("Address")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("ContactEmail")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("ContactPhone")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<bool>("IsActive")
+                        .HasColumnType("bit");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Schools");
                 });
 
             modelBuilder.Entity("School.Domain.Entities.Staff.ClassTeacherMap", b =>
@@ -1207,6 +1369,9 @@ namespace School.Persistence.Migrations
 
                     b.Property<int>("DivisionId")
                         .HasColumnType("int");
+
+                    b.Property<Guid>("SchoolId")
+                        .HasColumnType("uniqueidentifier");
 
                     b.Property<int>("StaffId")
                         .HasColumnType("int");
@@ -1226,6 +1391,9 @@ namespace School.Persistence.Migrations
 
                     b.Property<int>("LeaveTypeId")
                         .HasColumnType("int");
+
+                    b.Property<Guid>("SchoolId")
+                        .HasColumnType("uniqueidentifier");
 
                     b.Property<int>("StaffId")
                         .HasColumnType("int");
@@ -1256,6 +1424,9 @@ namespace School.Persistence.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<Guid>("SchoolId")
+                        .HasColumnType("uniqueidentifier");
+
                     b.HasKey("Id");
 
                     b.ToTable("LeaveTypes");
@@ -1280,6 +1451,9 @@ namespace School.Persistence.Migrations
                     b.Property<decimal>("Deductions")
                         .HasPrecision(18, 2)
                         .HasColumnType("decimal(18,2)");
+
+                    b.Property<Guid>("SchoolId")
+                        .HasColumnType("uniqueidentifier");
 
                     b.Property<int>("StaffId")
                         .HasColumnType("int");
@@ -1326,9 +1500,12 @@ namespace School.Persistence.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<Guid>("SchoolId")
+                        .HasColumnType("uniqueidentifier");
+
                     b.HasKey("Id");
 
-                    b.HasIndex("EmployeeCode")
+                    b.HasIndex("SchoolId", "EmployeeCode")
                         .IsUnique();
 
                     b.ToTable("StaffMembers");
@@ -1355,6 +1532,9 @@ namespace School.Persistence.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<Guid>("SchoolId")
+                        .HasColumnType("uniqueidentifier");
+
                     b.Property<int>("StaffId")
                         .HasColumnType("int");
 
@@ -1379,6 +1559,9 @@ namespace School.Persistence.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<Guid>("SchoolId")
+                        .HasColumnType("uniqueidentifier");
+
                     b.Property<int>("StaffId")
                         .HasColumnType("int");
 
@@ -1399,6 +1582,9 @@ namespace School.Persistence.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<Guid>("SchoolId")
+                        .HasColumnType("uniqueidentifier");
+
                     b.HasKey("Id");
 
                     b.ToTable("StaffGroups");
@@ -1414,6 +1600,9 @@ namespace School.Persistence.Migrations
 
                     b.Property<int>("GroupId")
                         .HasColumnType("int");
+
+                    b.Property<Guid>("SchoolId")
+                        .HasColumnType("uniqueidentifier");
 
                     b.Property<int>("StaffId")
                         .HasColumnType("int");
@@ -1437,6 +1626,9 @@ namespace School.Persistence.Migrations
                     b.Property<string>("Name")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
+
+                    b.Property<Guid>("SchoolId")
+                        .HasColumnType("uniqueidentifier");
 
                     b.HasKey("Id");
 
@@ -1464,6 +1656,9 @@ namespace School.Persistence.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<Guid>("SchoolId")
+                        .HasColumnType("uniqueidentifier");
+
                     b.Property<int>("StaffId")
                         .HasColumnType("int");
 
@@ -1487,6 +1682,9 @@ namespace School.Persistence.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<Guid>("SchoolId")
+                        .HasColumnType("uniqueidentifier");
+
                     b.Property<int>("StaffId")
                         .HasColumnType("int");
 
@@ -1506,6 +1704,9 @@ namespace School.Persistence.Migrations
                     b.Property<string>("RfidCode")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
+
+                    b.Property<Guid>("SchoolId")
+                        .HasColumnType("uniqueidentifier");
 
                     b.Property<int>("StaffId")
                         .HasColumnType("int");
@@ -1529,6 +1730,9 @@ namespace School.Persistence.Migrations
 
                     b.Property<DateTime>("ScanTime")
                         .HasColumnType("datetime2");
+
+                    b.Property<Guid>("SchoolId")
+                        .HasColumnType("uniqueidentifier");
 
                     b.Property<int>("StaffId")
                         .HasColumnType("int");
@@ -1556,6 +1760,9 @@ namespace School.Persistence.Migrations
                         .HasPrecision(18, 2)
                         .HasColumnType("decimal(18,2)");
 
+                    b.Property<Guid>("SchoolId")
+                        .HasColumnType("uniqueidentifier");
+
                     b.Property<int>("StaffId")
                         .HasColumnType("int");
 
@@ -1574,6 +1781,9 @@ namespace School.Persistence.Migrations
                         .HasColumnType("int");
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<Guid>("SchoolId")
+                        .HasColumnType("uniqueidentifier");
 
                     b.Property<string>("SignaturePath")
                         .IsRequired()
@@ -1594,6 +1804,9 @@ namespace School.Persistence.Migrations
                         .HasColumnType("int");
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<Guid>("SchoolId")
+                        .HasColumnType("uniqueidentifier");
 
                     b.Property<int>("StaffId")
                         .HasColumnType("int");
@@ -1616,6 +1829,9 @@ namespace School.Persistence.Migrations
 
                     b.Property<int>("ClassId")
                         .HasColumnType("int");
+
+                    b.Property<Guid>("SchoolId")
+                        .HasColumnType("uniqueidentifier");
 
                     b.Property<int>("StaffId")
                         .HasColumnType("int");
@@ -1642,6 +1858,9 @@ namespace School.Persistence.Migrations
                     b.Property<bool>("IsInstalled")
                         .HasColumnType("bit");
 
+                    b.Property<Guid>("SchoolId")
+                        .HasColumnType("uniqueidentifier");
+
                     b.Property<int>("StudentId")
                         .HasColumnType("int");
 
@@ -1657,6 +1876,9 @@ namespace School.Persistence.Migrations
                         .HasColumnType("int");
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<Guid>("SchoolId")
+                        .HasColumnType("uniqueidentifier");
 
                     b.Property<int>("StudentId")
                         .HasColumnType("int");
@@ -1754,9 +1976,12 @@ namespace School.Persistence.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<Guid>("SchoolId")
+                        .HasColumnType("uniqueidentifier");
+
                     b.HasKey("Id");
 
-                    b.HasIndex("GRNumber")
+                    b.HasIndex("SchoolId", "GRNumber")
                         .IsUnique();
 
                     b.ToTable("Students");
@@ -1797,6 +2022,9 @@ namespace School.Persistence.Migrations
                     b.Property<string>("PinCode")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
+
+                    b.Property<Guid>("SchoolId")
+                        .HasColumnType("uniqueidentifier");
 
                     b.Property<string>("State")
                         .IsRequired()
@@ -1866,6 +2094,9 @@ namespace School.Persistence.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<Guid>("SchoolId")
+                        .HasColumnType("uniqueidentifier");
+
                     b.Property<int>("StudentId")
                         .HasColumnType("int");
 
@@ -1897,6 +2128,9 @@ namespace School.Persistence.Migrations
                     b.Property<string>("Remark")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
+
+                    b.Property<Guid>("SchoolId")
+                        .HasColumnType("uniqueidentifier");
 
                     b.Property<int>("StudentId")
                         .HasColumnType("int");
@@ -1930,6 +2164,9 @@ namespace School.Persistence.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<Guid>("SchoolId")
+                        .HasColumnType("uniqueidentifier");
+
                     b.Property<int>("StudentId")
                         .HasColumnType("int");
 
@@ -1957,6 +2194,9 @@ namespace School.Persistence.Migrations
                     b.Property<string>("FilePath")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
+
+                    b.Property<Guid>("SchoolId")
+                        .HasColumnType("uniqueidentifier");
 
                     b.Property<int>("StudentId")
                         .HasColumnType("int");
@@ -1986,6 +2226,9 @@ namespace School.Persistence.Migrations
                     b.Property<string>("Reason")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
+
+                    b.Property<Guid>("SchoolId")
+                        .HasColumnType("uniqueidentifier");
 
                     b.Property<int>("StudentId")
                         .HasColumnType("int");
@@ -2050,6 +2293,9 @@ namespace School.Persistence.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<Guid>("SchoolId")
+                        .HasColumnType("uniqueidentifier");
+
                     b.Property<int>("StudentId")
                         .HasColumnType("int");
 
@@ -2073,6 +2319,9 @@ namespace School.Persistence.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<Guid>("SchoolId")
+                        .HasColumnType("uniqueidentifier");
+
                     b.Property<int>("StudentId")
                         .HasColumnType("int");
 
@@ -2092,6 +2341,9 @@ namespace School.Persistence.Migrations
                     b.Property<string>("RfidCode")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
+
+                    b.Property<Guid>("SchoolId")
+                        .HasColumnType("uniqueidentifier");
 
                     b.Property<int>("StudentId")
                         .HasColumnType("int");
@@ -2130,6 +2382,9 @@ namespace School.Persistence.Migrations
 
                     b.Property<int>("Role")
                         .HasColumnType("int");
+
+                    b.Property<Guid?>("SchoolId")
+                        .HasColumnType("uniqueidentifier");
 
                     b.Property<int?>("StudentId")
                         .HasColumnType("int");

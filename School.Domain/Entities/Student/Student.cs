@@ -1,7 +1,10 @@
+using School.Domain.Common;
+
 namespace School.Domain.Entities.Student;
 
-public class Student
+public class Student : ITenantEntity
 {
+    public Guid SchoolId { get; set; }
     public int      Id              { get; set; }
     public int      FinancialYearId { get; set; }
     public int      ClassId         { get; set; }

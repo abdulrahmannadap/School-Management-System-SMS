@@ -51,6 +51,9 @@ public class AccountController(AppDbContext db, IJwtService jwtService) : Contro
         if (user.Role == UserRole.Student && user.StudentId.HasValue)
             claims.Add(new Claim("StudentId", user.StudentId.Value.ToString()));
 
+        if (user.SchoolId.HasValue)
+            claims.Add(new Claim("SchoolId", user.SchoolId.Value.ToString()));
+
         var identity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
         var principal = new ClaimsPrincipal(identity);
 

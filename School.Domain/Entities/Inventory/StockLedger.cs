@@ -1,7 +1,10 @@
+using School.Domain.Common;
+
 namespace School.Domain.Entities.Inventory;
 
-public class StockLedger
+public class StockLedger : ITenantEntity
 {
+    public Guid SchoolId { get; set; }
     public int      Id          { get; set; }
     public int      ProductId   { get; set; }
     public decimal  InQty       { get; set; }

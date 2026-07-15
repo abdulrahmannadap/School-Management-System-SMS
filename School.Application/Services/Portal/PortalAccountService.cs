@@ -26,11 +26,12 @@ public class PortalAccountService(
         await userRepo.AddAsync(new User
         {
             FullName     = student.FullName,
-            Email        = $"{student.GRNumber}@student.local",
+            Email        = $"student{student.Id}@student.local",
             PasswordHash = PasswordHasher.Hash(student.GRNumber),
             Role         = UserRole.Student,
             IsActive     = true,
-            StudentId    = student.Id
+            StudentId    = student.Id,
+            SchoolId     = student.SchoolId
         }, ct);
         await userRepo.SaveChangesAsync(ct);
         return true;
@@ -93,7 +94,8 @@ public class PortalAccountService(
                 Email        = email,
                 PasswordHash = PasswordHasher.Hash(password),
                 Role         = UserRole.Parent,
-                IsActive     = true
+                IsActive     = true,
+                SchoolId     = student.SchoolId
             };
             await userRepo.AddAsync(user, ct);
             await userRepo.SaveChangesAsync(ct);

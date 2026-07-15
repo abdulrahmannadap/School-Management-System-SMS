@@ -1,7 +1,10 @@
+using School.Domain.Common;
+
 namespace School.Domain.Entities.Student;
 
-public class StudentContact
+public class StudentContact : ITenantEntity
 {
+    public Guid SchoolId { get; set; }
     public int    Id           { get; set; }
     public int    StudentId    { get; set; }
     public string FatherPhone  { get; set; } = string.Empty;

@@ -1,7 +1,10 @@
+using School.Domain.Common;
+
 namespace School.Domain.Entities.Exam;
 
-public class ExamDetail
+public class ExamDetail : ITenantEntity
 {
+    public Guid SchoolId { get; set; }
     public int      Id           { get; set; }
     public int      ExamId       { get; set; }
     public int      SubjectId    { get; set; }

@@ -1,7 +1,10 @@
+using School.Domain.Common;
+
 namespace School.Domain.Entities.Staff;
 
-public class Staff
+public class Staff : ITenantEntity
 {
+    public Guid SchoolId { get; set; }
     public int      Id           { get; set; }
     public string   FullName     { get; set; } = string.Empty;
     public string   EmployeeCode { get; set; } = string.Empty;

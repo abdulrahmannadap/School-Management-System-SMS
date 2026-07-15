@@ -1,4 +1,8 @@
+using System.Linq.Expressions;
+using System.Reflection;
 using Microsoft.EntityFrameworkCore;
+using School.Application.Interfaces;
+using School.Domain.Common;
 using School.Domain.Entities;
 using School.Domain.Entities.Exam;
 using School.Domain.Entities.Fees;
@@ -10,10 +14,11 @@ using School.Domain.Entities.Student;
 
 namespace School.Persistence;
 
-public class AppDbContext(DbContextOptions<AppDbContext> options) : DbContext(options)
+public class AppDbContext(DbContextOptions<AppDbContext> options, ICurrentSchoolContext currentSchool) : DbContext(options)
 {
     // ── Auth ────────────────────────────────────────────────
     public DbSet<User>               Users              => Set<User>();
+    public DbSet<Domain.Entities.School> Schools        => Set<Domain.Entities.School>();
 
     // ── Masters ─────────────────────────────────────────────
     public DbSet<FinancialYear>      FinancialYears     => Set<FinancialYear>();
@@ -120,15 +125,51 @@ public class AppDbContext(DbContextOptions<AppDbContext> options) : DbContext(op
             e.Property(u => u.FullName).HasMaxLength(100);
             e.Property(u => u.Email).HasMaxLength(150);
             e.Property(u => u.PasswordHash).HasMaxLength(256);
+            e.HasQueryFilter(u => currentSchool.SchoolId == null || u.SchoolId == currentSchool.SchoolId);
         });
 
         modelBuilder.Entity<Student>(e =>
-            e.HasIndex(s => s.GRNumber).IsUnique());
+            e.HasIndex(s => new { s.SchoolId, s.GRNumber }).IsUnique());
 
         modelBuilder.Entity<Staff>(e =>
-            e.HasIndex(s => s.EmployeeCode).IsUnique());
+            e.HasIndex(s => new { s.SchoolId, s.EmployeeCode }).IsUnique());
 
         modelBuilder.Entity<LibraryBook>(e =>
-            e.HasIndex(b => b.ISBN).IsUnique());
+            e.HasIndex(b => new { b.SchoolId, b.ISBN }).IsUnique());
+
+        // ── Multi-tenancy: apply a global query filter to every ITenantEntity ──
+        var setQueryFilterMethod = typeof(AppDbContext)
+            .GetMethod(nameof(SetTenantQueryFilter), BindingFlags.NonPublic | BindingFlags.Instance)!;
+
+        foreach (var entityType in modelBuilder.Model.GetEntityTypes())
+        {
+            if (typeof(ITenantEntity).IsAssignableFrom(entityType.ClrType))
+            {
+                setQueryFilterMethod
+                    .MakeGenericMethod(entityType.ClrType)
+                    .Invoke(this, [modelBuilder]);
+            }
+        }
+    }
+
+    private void SetTenantQueryFilter<T>(ModelBuilder modelBuilder) where T : class, ITenantEntity
+    {
+        Expression<Func<T, bool>> filter = e => currentSchool.SchoolId == null || e.SchoolId == currentSchool.SchoolId;
+        modelBuilder.Entity<T>().HasQueryFilter(filter);
+    }
+
+    public override async Task<int> SaveChangesAsync(CancellationToken cancellationToken = default)
+    {
+        foreach (var entry in ChangeTracker.Entries<ITenantEntity>())
+        {
+            if (entry.State == EntityState.Added && entry.Entity.SchoolId == Guid.Empty)
+            {
+                entry.Entity.SchoolId = currentSchool.SchoolId
+                    ?? throw new InvalidOperationException(
+                        $"Cannot create a {entry.Entity.GetType().Name} without a current school context.");
+            }
+        }
+
+        return await base.SaveChangesAsync(cancellationToken);
     }
 }

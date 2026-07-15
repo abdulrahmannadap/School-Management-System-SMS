@@ -12,4 +12,5 @@ public class User
     public bool IsActive { get; set; } = true;
     public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
     public int? StudentId { get; set; }
+    public Guid? SchoolId { get; set; }
 }

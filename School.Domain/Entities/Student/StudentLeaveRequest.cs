@@ -1,7 +1,10 @@
+using School.Domain.Common;
+
 namespace School.Domain.Entities.Student;
 
-public class StudentLeaveRequest
+public class StudentLeaveRequest : ITenantEntity
 {
+    public Guid SchoolId { get; set; }
     public int      Id         { get; set; }
     public int      StudentId  { get; set; }
     public DateTime FromDate   { get; set; }

@@ -1,0 +1,138 @@
+@model School.Web.Models.Inventory.NewInvoiceViewModel
+@{ ViewData["Title"] = "New Invoice"; }
+
+<div asp-validation-summary="ModelOnly" class="text-danger small mb-3"></div>
+
+<div class="card border-0 shadow-sm">
+    <div class="card-header bg-white border-0 pt-3 d-flex justify-content-between align-items-center">
+        <h6 class="mb-0 fw-semibold"><i class="bi bi-file-earmark-plus me-2 text-primary"></i>New Invoice</h6>
+        <a asp-action="Invoices" class="btn btn-outline-secondary btn-sm">Back to Invoices</a>
+    </div>
+    <div class="card-body">
+        <form asp-action="CreateInvoice" method="post" id="invoiceForm">
+            @Html.AntiForgeryToken()
+            <div class="row g-3 mb-3">
+                <div class="col-sm-4">
+                    <label class="form-label">Date</label>
+                    <input asp-for="Form.Date" type="date" class="form-control" />
+                    <span asp-validation-for="Form.Date" class="text-danger small"></span>
+                </div>
+                <div class="col-sm-4">
+                    <label class="form-label">Customer Name</label>
+                    <input asp-for="Form.CustomerName" class="form-control" />
+                    <span asp-validation-for="Form.CustomerName" class="text-danger small"></span>
+                </div>
+                <div class="col-sm-4">
+                    <label class="form-label">Paid Amount</label>
+                    <input asp-for="Form.PaidAmount" type="number" step="0.01" class="form-control" />
+                    <span asp-validation-for="Form.PaidAmount" class="text-danger small"></span>
+                </div>
+            </div>
+
+            <div class="table-responsive mb-2">
+                <table class="table table-sm align-middle" id="itemsTable">
+                    <thead>
+                        <tr>
+                            <th>Product</th>
+                            <th style="width:120px">Quantity</th>
+                            <th style="width:120px">Rate</th>
+                            <th style="width:120px" class="text-end">Amount</th>
+                            <th style="width:40px"></th>
+                        </tr>
+                    </thead>
+                    <tbody id="itemsBody">
+                        @for (var i = 0; i < Model.Form.Items.Count; i++)
+                        {
+                            <tr class="item-row">
+                                <td>
+                                    <select name="Form.Items[@i].ProductId" class="form-select form-select-sm item-product">
+                                        <option value="">Select product</option>
+                                        @foreach (var p in Model.Products)
+                                        {
+                                            <option value="@p.Id" data-rate="@p.SellingPrice">@p.Name</option>
+                                        }
+                                    </select>
+                                </td>
+                                <td><input name="Form.Items[@i].Quantity" type="number" step="0.01" class="form-control form-control-sm item-qty" value="@Model.Form.Items[i].Quantity" /></td>
+                                <td><input name="Form.Items[@i].Rate" type="number" step="0.01" class="form-control form-control-sm item-rate" value="@Model.Form.Items[i].Rate" /></td>
+                                <td class="text-end item-amount">0.00</td>
+                                <td><button type="button" class="btn btn-sm btn-outline-danger remove-row"><i class="bi bi-trash"></i></button></td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+
+            <button type="button" id="addRow" class="btn btn-sm btn-outline-primary mb-3"><i class="bi bi-plus-circle me-1"></i>Add Line</button>
+
+            <div class="d-flex justify-content-end mb-3">
+                <div class="text-end">
+                    <div class="text-muted small">Total Amount</div>
+                    <div class="fs-4 fw-bold" id="totalAmount">₹0.00</div>
+                </div>
+            </div>
+
+            <button type="submit" class="btn btn-primary"><i class="bi bi-check2-circle me-1"></i>Create Invoice</button>
+        </form>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+    <script>
+        let rowIndex = @Model.Form.Items.Count;
+
+        function recalcRow(row) {
+            const qty = parseFloat(row.querySelector('.item-qty').value) || 0;
+            const rate = parseFloat(row.querySelector('.item-rate').value) || 0;
+            row.querySelector('.item-amount').textContent = (qty * rate).toFixed(2);
+            recalcTotal();
+        }
+
+        function recalcTotal() {
+            let total = 0;
+            document.querySelectorAll('#itemsBody .item-row').forEach(row => {
+                const qty = parseFloat(row.querySelector('.item-qty').value) || 0;
+                const rate = parseFloat(row.querySelector('.item-rate').value) || 0;
+                total += qty * rate;
+            });
+            document.getElementById('totalAmount').textContent = '₹' + total.toFixed(2);
+        }
+
+        function wireRow(row) {
+            row.querySelector('.item-product').addEventListener('change', function () {
+                const opt = this.options[this.selectedIndex];
+                const rate = opt.getAttribute('data-rate');
+                if (rate) row.querySelector('.item-rate').value = rate;
+                recalcRow(row);
+            });
+            row.querySelector('.item-qty').addEventListener('input', () => recalcRow(row));
+            row.querySelector('.item-rate').addEventListener('input', () => recalcRow(row));
+            row.querySelector('.remove-row').addEventListener('click', () => {
+                if (document.querySelectorAll('#itemsBody .item-row').length > 1) {
+                    row.remove();
+                    recalcTotal();
+                }
+            });
+        }
+
+        document.querySelectorAll('#itemsBody .item-row').forEach(wireRow);
+        recalcTotal();
+
+        document.getElementById('addRow').addEventListener('click', function () {
+            const tbody = document.getElementById('itemsBody');
+            const first = tbody.querySelector('.item-row');
+            const clone = first.cloneNode(true);
+
+            clone.querySelectorAll('[name]').forEach(el => {
+                el.name = el.name.replace(/Items\[\d+\]/, 'Items[' + rowIndex + ']');
+                if (el.tagName === 'SELECT') el.value = '';
+                else el.value = '';
+            });
+            clone.querySelector('.item-amount').textContent = '0.00';
+            tbody.appendChild(clone);
+            wireRow(clone);
+            rowIndex++;
+        });
+    </script>
+}

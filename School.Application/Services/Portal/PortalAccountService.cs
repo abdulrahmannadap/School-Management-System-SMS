@@ -10,7 +10,8 @@ namespace School.Application.Services.Portal;
 public class PortalAccountService(
     IGenericRepository<User>              userRepo,
     IGenericRepository<ParentStudentLink> linkRepo,
-    IGenericRepository<Domain.Entities.Student.Student> studentRepo) : IPortalAccountService
+    IGenericRepository<Domain.Entities.Student.Student> studentRepo,
+    IGenericRepository<Domain.Entities.Staff.Staff> staffRepo) : IPortalAccountService
 {
     public async Task<bool> HasStudentLoginAsync(int studentId, CancellationToken ct = default) =>
         await userRepo.AnyAsync(u => u.StudentId == studentId, ct);
@@ -32,6 +33,31 @@ public class PortalAccountService(
             IsActive     = true,
             StudentId    = student.Id,
             SchoolId     = student.SchoolId
+        }, ct);
+        await userRepo.SaveChangesAsync(ct);
+        return true;
+    }
+
+    public async Task<bool> HasStaffLoginAsync(int staffId, CancellationToken ct = default) =>
+        await userRepo.AnyAsync(u => u.StaffId == staffId, ct);
+
+    public async Task<bool> CreateStaffLoginAsync(int staffId, UserRole role, CancellationToken ct = default)
+    {
+        if (await HasStaffLoginAsync(staffId, ct))
+            return false;
+
+        var staff = await staffRepo.FirstOrDefaultAsync(s => s.Id == staffId, ct)
+            ?? throw new KeyNotFoundException($"Staff {staffId} not found.");
+
+        await userRepo.AddAsync(new User
+        {
+            FullName     = staff.FullName,
+            Email        = $"staff{staff.Id}@staff.local",
+            PasswordHash = PasswordHasher.Hash(staff.EmployeeCode),
+            Role         = role,
+            IsActive     = true,
+            StaffId      = staff.Id,
+            SchoolId     = staff.SchoolId
         }, ct);
         await userRepo.SaveChangesAsync(ct);
         return true;

@@ -1,11 +1,14 @@
+using School.Application.Common;
 using School.Application.DTOs.Staff;
 using School.Application.Interfaces;
+using School.Domain.Entities;
 using School.Domain.Entities.Staff;
 
 namespace School.Application.Services.Staff;
 
 public class StaffService(
     IGenericRepository<Domain.Entities.Staff.Staff> staffRepo,
+    IGenericRepository<User>                         userRepo,
     IGenericRepository<StaffAttendance>              attendanceRepo,
     IGenericRepository<StaffPhoto>                   photoRepo,
     IGenericRepository<StaffSignature>               signatureRepo,
@@ -64,6 +67,20 @@ public class StaffService(
         };
         await staffRepo.AddAsync(entity, ct);
         await staffRepo.SaveChangesAsync(ct);
+
+        // auto-create a portal login for the staff member
+        await userRepo.AddAsync(new User
+        {
+            FullName     = entity.FullName,
+            Email        = $"staff{entity.Id}@staff.local",
+            PasswordHash = PasswordHasher.Hash(entity.EmployeeCode),
+            Role         = dto.LoginRole,
+            IsActive     = true,
+            StaffId      = entity.Id,
+            SchoolId     = entity.SchoolId
+        }, ct);
+        await userRepo.SaveChangesAsync(ct);
+
         return MapStaff(entity);
     }
 

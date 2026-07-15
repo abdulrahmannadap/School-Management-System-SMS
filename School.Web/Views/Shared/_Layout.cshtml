@@ -263,6 +263,7 @@
                 </a>
                 <ul class="collapse sub-nav list-unstyled" id="adm-fees">
                     <li><a class="nav-link" asp-area="SchoolAdmin" asp-controller="Fees" asp-action="Index"><i class="bi bi-collection nav-icon"></i> Fee Master</a></li>
+                    <li><a class="nav-link" asp-area="SchoolAdmin" asp-controller="Fees" asp-action="DepositMasters"><i class="bi bi-safe nav-icon"></i> Deposit Master</a></li>
                     <li><a class="nav-link" href="#"><i class="bi bi-receipt nav-icon"></i> Collection</a></li>
                     <li><a class="nav-link" href="#"><i class="bi bi-clock-history nav-icon"></i> Pending Fees</a></li>
                     <li><a class="nav-link" href="#"><i class="bi bi-percent nav-icon"></i> Discounts</a></li>
@@ -396,8 +397,8 @@
                     <li><a class="nav-link" asp-area="Accountant" asp-controller="Fees" asp-action="Index"><i class="bi bi-plus-circle nav-icon"></i> Collect Fee</a></li>
                     <li><a class="nav-link" href="#"><i class="bi bi-clock-history nav-icon"></i> Pending Fees</a></li>
                     <li><a class="nav-link" href="#"><i class="bi bi-receipt nav-icon"></i> Fee Ledger</a></li>
-                    <li><a class="nav-link" href="#"><i class="bi bi-arrow-counterclockwise nav-icon"></i> Refunds</a></li>
-                    <li><a class="nav-link" href="#"><i class="bi bi-percent nav-icon"></i> Discounts</a></li>
+                    <li><a class="nav-link" asp-area="Accountant" asp-controller="Fees" asp-action="Index"><i class="bi bi-arrow-counterclockwise nav-icon"></i> Refunds</a></li>
+                    <li><a class="nav-link" asp-area="Accountant" asp-controller="Fees" asp-action="Index"><i class="bi bi-percent nav-icon"></i> Discounts</a></li>
                 </ul>
             </li>
 
@@ -410,8 +411,8 @@
                 </a>
                 <ul class="collapse sub-nav list-unstyled" id="acc-banking">
                     <li><a class="nav-link" href="#"><i class="bi bi-check2-circle nav-icon"></i> Cheques</a></li>
-                    <li><a class="nav-link" href="#"><i class="bi bi-safe nav-icon"></i> Deposits</a></li>
-                    <li><a class="nav-link" href="#"><i class="bi bi-file-earmark-text nav-icon"></i> Vouchers</a></li>
+                    <li><a class="nav-link" asp-area="Accountant" asp-controller="Fees" asp-action="Index"><i class="bi bi-safe nav-icon"></i> Deposits</a></li>
+                    <li><a class="nav-link" asp-area="Accountant" asp-controller="Fees" asp-action="Vouchers"><i class="bi bi-file-earmark-text nav-icon"></i> Vouchers</a></li>
                 </ul>
             </li>
 

@@ -122,7 +122,7 @@
     </div>
 
     <div class="col-lg-5">
-        <div class="card border-0 shadow-sm">
+        <div class="card border-0 shadow-sm mb-3">
             <div class="card-header bg-white border-0 pt-3">
                 <h6 class="mb-0 fw-semibold"><i class="bi bi-cash-coin me-2 text-primary"></i>Receive Payment</h6>
             </div>
@@ -157,6 +157,138 @@
                     </div>
                     <button type="submit" class="btn btn-primary w-100"><i class="bi bi-check2-circle me-1"></i>Receive Payment</button>
                 </form>
+            </div>
+        </div>
+
+        <div class="card border-0 shadow-sm mb-3">
+            <div class="card-header bg-white border-0 pt-3">
+                <h6 class="mb-0 fw-semibold"><i class="bi bi-percent me-2 text-primary"></i>Discount</h6>
+            </div>
+            <div class="card-body">
+                @if (Model.Discounts.Any())
+                {
+                    <div class="table-responsive mb-3">
+                        <table class="table table-sm align-middle mb-0">
+                            <thead><tr><th>Reason</th><th class="text-end">Amount</th></tr></thead>
+                            <tbody>
+                                @foreach (var d in Model.Discounts)
+                                {
+                                    <tr><td>@d.Reason</td><td class="text-end">₹@d.Amount.ToString("N2")</td></tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                }
+                <form asp-action="ApplyDiscount" method="post">
+                    @Html.AntiForgeryToken()
+                    <input type="hidden" asp-for="DiscountForm.StudentId" />
+                    <div class="mb-2">
+                        <input asp-for="DiscountForm.Amount" type="number" step="0.01" class="form-control form-control-sm" placeholder="Amount" />
+                        <span asp-validation-for="DiscountForm.Amount" class="text-danger small"></span>
+                    </div>
+                    <div class="mb-2">
+                        <input asp-for="DiscountForm.Reason" class="form-control form-control-sm" placeholder="Reason" />
+                        <span asp-validation-for="DiscountForm.Reason" class="text-danger small"></span>
+                    </div>
+                    <button type="submit" class="btn btn-outline-primary btn-sm w-100">Apply Discount</button>
+                </form>
+            </div>
+        </div>
+
+        <div class="card border-0 shadow-sm mb-3">
+            <div class="card-header bg-white border-0 pt-3">
+                <h6 class="mb-0 fw-semibold"><i class="bi bi-arrow-counterclockwise me-2 text-primary"></i>Refund</h6>
+            </div>
+            <div class="card-body">
+                @if (Model.Refunds.Any())
+                {
+                    <div class="table-responsive mb-3">
+                        <table class="table table-sm align-middle mb-0">
+                            <thead><tr><th>Reason</th><th class="text-end">Amount</th></tr></thead>
+                            <tbody>
+                                @foreach (var r in Model.Refunds)
+                                {
+                                    <tr><td>@r.Reason</td><td class="text-end">₹@r.Amount.ToString("N2")</td></tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                }
+                <form asp-action="ProcessRefund" method="post">
+                    @Html.AntiForgeryToken()
+                    <input type="hidden" asp-for="RefundForm.StudentId" />
+                    <div class="mb-2">
+                        <input asp-for="RefundForm.Amount" type="number" step="0.01" class="form-control form-control-sm" placeholder="Amount" />
+                        <span asp-validation-for="RefundForm.Amount" class="text-danger small"></span>
+                    </div>
+                    <div class="mb-2">
+                        <input asp-for="RefundForm.Reason" class="form-control form-control-sm" placeholder="Reason" />
+                        <span asp-validation-for="RefundForm.Reason" class="text-danger small"></span>
+                    </div>
+                    <button type="submit" class="btn btn-outline-danger btn-sm w-100">Process Refund</button>
+                </form>
+            </div>
+        </div>
+
+        <div class="card border-0 shadow-sm">
+            <div class="card-header bg-white border-0 pt-3">
+                <h6 class="mb-0 fw-semibold"><i class="bi bi-safe me-2 text-primary"></i>Deposit</h6>
+            </div>
+            <div class="card-body">
+                @if (Model.DepositTransactions.Any())
+                {
+                    <div class="table-responsive mb-3">
+                        <table class="table table-sm align-middle mb-0">
+                            <thead><tr><th>Date</th><th>Type</th><th class="text-end">Amount</th></tr></thead>
+                            <tbody>
+                                @foreach (var d in Model.DepositTransactions)
+                                {
+                                    <tr>
+                                        <td>@d.Date.ToString("dd MMM yyyy")</td>
+                                        <td>@d.Type</td>
+                                        <td class="text-end">₹@d.Amount.ToString("N2")</td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                }
+                @if (!Model.DepositMasters.Any())
+                {
+                    <p class="text-muted small mb-0">No deposit types set up yet. Ask SchoolAdmin to add one under Fees &gt; Deposit Master.</p>
+                }
+                else
+                {
+                    <form asp-action="RecordDeposit" method="post">
+                        @Html.AntiForgeryToken()
+                        <input type="hidden" asp-for="DepositForm.StudentId" />
+                        <div class="mb-2">
+                            <select asp-for="DepositForm.DepositMasterId" class="form-select form-select-sm">
+                                <option value="">Select deposit type</option>
+                                @foreach (var dm in Model.DepositMasters)
+                                {
+                                    <option value="@dm.Id">@dm.DepositName</option>
+                                }
+                            </select>
+                            <span asp-validation-for="DepositForm.DepositMasterId" class="text-danger small"></span>
+                        </div>
+                        <div class="mb-2">
+                            <input asp-for="DepositForm.Amount" type="number" step="0.01" class="form-control form-control-sm" placeholder="Amount" />
+                            <span asp-validation-for="DepositForm.Amount" class="text-danger small"></span>
+                        </div>
+                        <div class="mb-2">
+                            <input asp-for="DepositForm.Date" type="date" class="form-control form-control-sm" />
+                            <span asp-validation-for="DepositForm.Date" class="text-danger small"></span>
+                        </div>
+                        <div class="mb-2">
+                            <select asp-for="DepositForm.Type" class="form-select form-select-sm">
+                                <option value="Paid">Paid</option>
+                                <option value="Refunded">Refunded</option>
+                            </select>
+                        </div>
+                        <button type="submit" class="btn btn-outline-secondary btn-sm w-100">Record Deposit</button>
+                    </form>
+                }
             </div>
         </div>
     </div>

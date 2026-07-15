@@ -98,6 +98,48 @@ public class FeesController(IFeesService feesSvc, IMastersService mastersSvc, IS
         return RedirectToAction(nameof(ApplyToStudents), new { feeMasterId = form.FeeMasterId });
     }
 
+    public async Task<IActionResult> DepositMasters(CancellationToken ct)
+    {
+        ViewData["Title"] = "Deposit Master";
+        return View(new DepositMasterIndexViewModel { Items = await feesSvc.GetDepositMastersAsync(ct) });
+    }
+
+    [HttpPost]
+    [ValidateAntiForgeryToken]
+    public async Task<IActionResult> SaveDepositMaster(DepositMasterFormModel form, CancellationToken ct)
+    {
+        if (!ModelState.IsValid)
+        {
+            ViewData["Title"] = "Deposit Master";
+            var vm = new DepositMasterIndexViewModel
+            {
+                Items     = await feesSvc.GetDepositMastersAsync(ct),
+                Form      = form,
+                ShowModal = true
+            };
+            return View("DepositMasters", vm);
+        }
+
+        var dto = new DepositMasterDto { Id = form.Id, DepositName = form.DepositName, Amount = form.Amount };
+
+        if (form.Id == 0)
+            await feesSvc.CreateDepositMasterAsync(dto, ct);
+        else
+            await feesSvc.UpdateDepositMasterAsync(dto, ct);
+
+        TempData["Success"] = "Deposit master saved.";
+        return RedirectToAction(nameof(DepositMasters));
+    }
+
+    [HttpPost]
+    [ValidateAntiForgeryToken]
+    public async Task<IActionResult> DeleteDepositMaster(int id, CancellationToken ct)
+    {
+        await feesSvc.DeleteDepositMasterAsync(id, ct);
+        TempData["Success"] = "Deposit master deleted.";
+        return RedirectToAction(nameof(DepositMasters));
+    }
+
     private async Task<ApplyFeeViewModel> BuildApplyViewModel(FeeMasterDto feeMaster, CancellationToken ct)
     {
         var classes = await mastersSvc.GetClassesAsync(ct);

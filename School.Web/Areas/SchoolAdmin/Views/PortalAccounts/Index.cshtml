@@ -88,6 +88,83 @@
     </div>
 </div>
 
+<div class="card border-0 shadow-sm mb-3">
+    <div class="card-header bg-white border-0 pt-3">
+        <h6 class="mb-0 fw-semibold"><i class="bi bi-person-badge me-2 text-primary"></i>Staff Logins</h6>
+    </div>
+    <div class="card-body">
+        <form asp-action="Index" method="get" class="row g-2 align-items-end mb-3">
+            <div class="col-sm-4">
+                <label class="form-label small">Name</label>
+                <input type="text" name="staffName" value="@Model.StaffName" class="form-control form-control-sm" />
+            </div>
+            <div class="col-sm-4">
+                <label class="form-label small">Employee Code</label>
+                <input type="text" name="staffCode" value="@Model.StaffCode" class="form-control form-control-sm" />
+            </div>
+            <div class="col-sm-4">
+                <button type="submit" class="btn btn-sm btn-outline-primary"><i class="bi bi-search me-1"></i>Search</button>
+            </div>
+        </form>
+
+        @if (!Model.StaffResults.Any())
+        {
+            <p class="text-muted text-center py-3 mb-0">Search by name or employee code to see login status.</p>
+        }
+        else
+        {
+            <div class="table-responsive">
+                <table class="table align-middle">
+                    <thead>
+                        <tr>
+                            <th>Name</th>
+                            <th>Employee Code</th>
+                            <th>Login</th>
+                            <th class="text-end">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var row in Model.StaffResults)
+                        {
+                            <tr>
+                                <td>@row.Staff.FullName</td>
+                                <td>@row.Staff.EmployeeCode</td>
+                                <td>
+                                    @if (row.HasLogin)
+                                    {
+                                        <span class="badge bg-success-subtle text-success">Active</span>
+                                    }
+                                    else
+                                    {
+                                        <span class="badge bg-secondary-subtle text-secondary">None</span>
+                                    }
+                                </td>
+                                <td class="text-end">
+                                    @if (!row.HasLogin)
+                                    {
+                                        <form asp-action="CreateStaffLogin" method="post" class="d-inline d-flex gap-1 justify-content-end">
+                                            @Html.AntiForgeryToken()
+                                            <input type="hidden" name="staffId" value="@row.Staff.Id" />
+                                            <select name="role" class="form-select form-select-sm w-auto">
+                                                <option value="Teacher">Teacher</option>
+                                                <option value="Accountant">Accountant</option>
+                                                <option value="Staff">Staff</option>
+                                            </select>
+                                            <button type="submit" class="btn btn-sm btn-outline-primary">
+                                                <i class="bi bi-key me-1"></i>Create Login
+                                            </button>
+                                        </form>
+                                    }
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        }
+    </div>
+</div>
+
 <div class="row g-3">
     <div class="col-lg-7">
         <div class="card border-0 shadow-sm">

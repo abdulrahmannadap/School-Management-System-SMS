@@ -38,7 +38,8 @@ public class StaffController(IStaffService staffSvc) : Controller
                 FullName    = form.FullName,
                 Mobile      = form.Mobile,
                 Designation = form.Designation,
-                JoiningDate = form.JoiningDate
+                JoiningDate = form.JoiningDate,
+                LoginRole   = form.LoginRole
             }, ct);
         else
             await staffSvc.UpdateAsync(new EditStaffDto

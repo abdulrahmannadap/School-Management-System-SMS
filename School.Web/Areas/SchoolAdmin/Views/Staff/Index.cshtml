@@ -135,6 +135,15 @@
                         <input asp-for="Form.JoiningDate" type="date" class="form-control" id="Form_JoiningDate" />
                         <span asp-validation-for="Form.JoiningDate" class="text-danger small"></span>
                     </div>
+                    <div class="col-md-6 mb-3" id="loginRoleField">
+                        <label class="form-label">Login Role</label>
+                        <select asp-for="Form.LoginRole" class="form-select" id="Form_LoginRole">
+                            <option value="Teacher">Teacher</option>
+                            <option value="Accountant">Accountant</option>
+                            <option value="Staff">Staff</option>
+                        </select>
+                        <div class="form-text">Determines which area this person's login can access.</div>
+                    </div>
                     <div class="col-md-6 mb-3" id="emailField">
                         <label class="form-label">Email</label>
                         <input asp-for="Form.Email" class="form-control" id="Form_Email" />
@@ -161,6 +170,7 @@
 
         function toggleCreateOnlyFields(isCreate) {
             document.getElementById('joiningDateField').style.display = isCreate ? '' : 'none';
+            document.getElementById('loginRoleField').style.display = isCreate ? '' : 'none';
             document.getElementById('emailField').style.display = isCreate ? 'none' : '';
             document.getElementById('isActiveField').style.display = isCreate ? 'none' : '';
         }
@@ -172,6 +182,7 @@
             document.getElementById('Form_Mobile').value = '';
             document.getElementById('Form_Designation').value = '';
             document.getElementById('Form_JoiningDate').value = '';
+            document.getElementById('Form_LoginRole').value = 'Staff';
             document.getElementById('Form_Email').value = '';
             document.getElementById('Form_IsActive').checked = false;
             toggleCreateOnlyFields(true);

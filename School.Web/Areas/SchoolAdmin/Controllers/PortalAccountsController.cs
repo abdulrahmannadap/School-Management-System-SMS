@@ -1,19 +1,21 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using School.Application.DTOs.Staff;
 using School.Application.DTOs.Student;
 using School.Application.Interfaces;
+using School.Domain.Enums;
 using School.Web.Models.Portal;
 
 namespace School.Web.Areas.SchoolAdmin.Controllers;
 
 [Area("SchoolAdmin")]
 [Authorize(Roles = "SchoolAdmin")]
-public class PortalAccountsController(IPortalAccountService portalSvc, IStudentService studentSvc) : Controller
+public class PortalAccountsController(IPortalAccountService portalSvc, IStudentService studentSvc, IStaffService staffSvc) : Controller
 {
-    public async Task<IActionResult> Index(StudentSearchDto search, CancellationToken ct)
+    public async Task<IActionResult> Index(StudentSearchDto search, string? staffName, string? staffCode, CancellationToken ct)
     {
         ViewData["Title"] = "Portal Accounts";
-        return View(await BuildViewModel(search, ct));
+        return View(await BuildViewModel(search, staffName, staffCode, ct));
     }
 
     [HttpPost]
@@ -27,12 +29,21 @@ public class PortalAccountsController(IPortalAccountService portalSvc, IStudentS
 
     [HttpPost]
     [ValidateAntiForgeryToken]
+    public async Task<IActionResult> CreateStaffLogin(int staffId, UserRole role, CancellationToken ct)
+    {
+        var created = await portalSvc.CreateStaffLoginAsync(staffId, role, ct);
+        TempData["Success"] = created ? "Staff login created." : "Staff member already has a login.";
+        return RedirectToAction(nameof(Index));
+    }
+
+    [HttpPost]
+    [ValidateAntiForgeryToken]
     public async Task<IActionResult> LinkParent(ParentLinkFormModel form, CancellationToken ct)
     {
         if (!ModelState.IsValid)
         {
             ViewData["Title"] = "Portal Accounts";
-            var vm = await BuildViewModel(new StudentSearchDto(), ct);
+            var vm = await BuildViewModel(new StudentSearchDto(), null, null, ct);
             vm.LinkForm = form;
             return View("Index", vm);
         }
@@ -44,7 +55,7 @@ public class PortalAccountsController(IPortalAccountService portalSvc, IStudentS
         {
             ModelState.AddModelError(nameof(form.GRNumber), "No student found with this GR Number.");
             ViewData["Title"] = "Portal Accounts";
-            var vm = await BuildViewModel(new StudentSearchDto(), ct);
+            var vm = await BuildViewModel(new StudentSearchDto(), null, null, ct);
             vm.LinkForm = form;
             return View("Index", vm);
         }
@@ -71,11 +82,14 @@ public class PortalAccountsController(IPortalAccountService portalSvc, IStudentS
         return RedirectToAction(nameof(Index));
     }
 
-    private async Task<PortalAccountsViewModel> BuildViewModel(StudentSearchDto search, CancellationToken ct)
+    private async Task<PortalAccountsViewModel> BuildViewModel(
+        StudentSearchDto search, string? staffName, string? staffCode, CancellationToken ct)
     {
         var vm = new PortalAccountsViewModel
         {
             Search      = search,
+            StaffName   = staffName,
+            StaffCode   = staffCode,
             ParentLinks = await portalSvc.GetAllParentLinksAsync(ct)
         };
 
@@ -86,6 +100,15 @@ public class PortalAccountsController(IPortalAccountService portalSvc, IStudentS
             foreach (var s in students)
                 rows.Add(new StudentLoginRow { Student = s, HasLogin = await portalSvc.HasStudentLoginAsync(s.Id, ct) });
             vm.StudentResults = rows;
+        }
+
+        if (!string.IsNullOrWhiteSpace(staffName) || !string.IsNullOrWhiteSpace(staffCode))
+        {
+            var staff = await staffSvc.SearchAsync(new StaffSearchDto { Name = staffName, EmployeeCode = staffCode }, ct);
+            var rows = new List<StaffLoginRow>();
+            foreach (var s in staff)
+                rows.Add(new StaffLoginRow { Staff = s, HasLogin = await portalSvc.HasStaffLoginAsync(s.Id, ct) });
+            vm.StaffResults = rows;
         }
 
         return vm;

@@ -1,0 +1,88 @@
+@model School.Web.Models.Library.BookLedgerViewModel
+@{ ViewData["Title"] = "Book Ledger"; }
+
+<div class="card border-0 shadow-sm mb-3">
+    <div class="card-body">
+        <form method="get" class="row g-2 align-items-end">
+            <div class="col-sm-8">
+                <label class="form-label small">Book</label>
+                <select name="bookId" class="form-select form-select-sm" onchange="this.form.submit()">
+                    <option value="">Select a book</option>
+                    @foreach (var b in Model.Books)
+                    {
+                        <option value="@b.Id" selected="@(Model.SelectedBookId == b.Id)">@b.Title</option>
+                    }
+                </select>
+            </div>
+            <div class="col-sm-4">
+                <button type="submit" class="btn btn-sm btn-outline-primary"><i class="bi bi-funnel me-1"></i>Load</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<div class="card border-0 shadow-sm">
+    <div class="card-header bg-white border-0 pt-3">
+        <h6 class="mb-0 fw-semibold"><i class="bi bi-journal-bookmark me-2 text-primary"></i>Ledger @(Model.SelectedBook is not null ? $"— {Model.SelectedBook.Title}" : "")</h6>
+    </div>
+    <div class="card-body">
+        @if (!Model.SelectedBookId.HasValue)
+        {
+            <div class="text-center text-muted py-5">
+                <i class="bi bi-funnel" style="font-size:2.5rem;opacity:.3"></i>
+                <p class="mt-2 mb-0">Select a book above to view its issue/return ledger.</p>
+            </div>
+        }
+        else if (!Model.Ledger.Any())
+        {
+            <div class="text-center text-muted py-5">
+                <i class="bi bi-journal-bookmark" style="font-size:2.5rem;opacity:.3"></i>
+                <p class="mt-2 mb-0">No ledger entries for this book yet</p>
+            </div>
+        }
+        else
+        {
+            <div class="table-responsive">
+                <table class="table table-sm align-middle">
+                    <thead>
+                        <tr>
+                            <th>Date</th>
+                            <th>Type</th>
+                            <th>Borrower</th>
+                            <th>Due Date</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var l in Model.Ledger)
+                        {
+                            <tr>
+                                <td>@l.Date.ToString("dd MMM yyyy")</td>
+                                <td>
+                                    @if (l.Type == "Issued")
+                                    {
+                                        <span class="badge bg-warning-subtle text-warning">Issued</span>
+                                    }
+                                    else
+                                    {
+                                        <span class="badge bg-success-subtle text-success">Returned</span>
+                                    }
+                                </td>
+                                <td>
+                                    @if (l.StudentId.HasValue)
+                                    {
+                                        <span>Student #@l.StudentId</span>
+                                    }
+                                    else if (l.StaffId.HasValue)
+                                    {
+                                        <span>Staff #@l.StaffId</span>
+                                    }
+                                </td>
+                                <td>@l.DueDate.ToString("dd MMM yyyy")</td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        }
+    </div>
+</div>

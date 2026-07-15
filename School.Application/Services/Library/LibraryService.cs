@@ -203,7 +203,8 @@ public class LibraryService(
             (!studentId.HasValue || i.StudentId == studentId) &&
             (!staffId.HasValue   || i.StaffId   == staffId), ct);
 
-        return list.OrderBy(i => i.DueDate).Select(MapIssueReport).ToList();
+        var titles = await GetBookTitlesAsync(list.Select(i => i.BookId), ct);
+        return list.OrderBy(i => i.DueDate).Select(i => MapIssueReport(i, titles)).ToList();
     }
 
     public async Task<IReadOnlyList<BookIssueReportDto>> GetIssueHistoryAsync(
@@ -213,7 +214,8 @@ public class LibraryService(
             (!studentId.HasValue || i.StudentId == studentId) &&
             (!staffId.HasValue   || i.StaffId   == staffId), ct);
 
-        return list.OrderByDescending(i => i.IssueDate).Select(MapIssueReport).ToList();
+        var titles = await GetBookTitlesAsync(list.Select(i => i.BookId), ct);
+        return list.OrderByDescending(i => i.IssueDate).Select(i => MapIssueReport(i, titles)).ToList();
     }
 
     // ── Ledger ───────────────────────────────────────────────
@@ -259,7 +261,8 @@ public class LibraryService(
         var list = await issueRepo.FindAsync(
             i => i.IssueDate.Date >= from.Date && i.IssueDate.Date <= to.Date, ct);
 
-        return list.OrderBy(i => i.IssueDate).Select(MapIssueReport).ToList();
+        var titles = await GetBookTitlesAsync(list.Select(i => i.BookId), ct);
+        return list.OrderBy(i => i.IssueDate).Select(i => MapIssueReport(i, titles)).ToList();
     }
 
     // ── Private mappers ──────────────────────────────────────
@@ -275,12 +278,22 @@ public class LibraryService(
         AvailableQuantity = b.AvailableQuantity
     };
 
-    private static BookIssueReportDto MapIssueReport(BookIssue i) => new()
+    private async Task<Dictionary<int, string>> GetBookTitlesAsync(IEnumerable<int> bookIds, CancellationToken ct)
     {
-        BookId    = i.BookId,
-        StudentId = i.StudentId,
-        StaffId   = i.StaffId,
-        IssueDate = i.IssueDate,
-        DueDate   = i.DueDate
+        var ids = bookIds.Distinct().ToList();
+        var books = await bookRepo.FindAsync(b => ids.Contains(b.Id), ct);
+        return books.ToDictionary(b => b.Id, b => b.Title);
+    }
+
+    private static BookIssueReportDto MapIssueReport(BookIssue i, IReadOnlyDictionary<int, string> titles) => new()
+    {
+        Id         = i.Id,
+        BookId     = i.BookId,
+        BookTitle  = titles.GetValueOrDefault(i.BookId, "—"),
+        StudentId  = i.StudentId,
+        StaffId    = i.StaffId,
+        IssueDate  = i.IssueDate,
+        DueDate    = i.DueDate,
+        IsReturned = i.IsReturned
     };
 }

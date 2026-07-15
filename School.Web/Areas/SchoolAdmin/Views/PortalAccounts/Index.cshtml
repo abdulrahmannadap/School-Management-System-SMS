@@ -1,0 +1,177 @@
+@model School.Web.Models.Portal.PortalAccountsViewModel
+@{ ViewData["Title"] = "Portal Accounts"; }
+
+@if (TempData["Success"] is string success)
+{
+    <div class="alert alert-success alert-dismissible fade show" role="alert">
+        @success
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    </div>
+}
+@if (TempData["Error"] is string error)
+{
+    <div class="alert alert-danger alert-dismissible fade show" role="alert">
+        @error
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    </div>
+}
+
+<div class="card border-0 shadow-sm mb-3">
+    <div class="card-header bg-white border-0 pt-3">
+        <h6 class="mb-0 fw-semibold"><i class="bi bi-person-check me-2 text-primary"></i>Student Logins</h6>
+    </div>
+    <div class="card-body">
+        <form asp-action="Index" method="get" class="row g-2 align-items-end mb-3">
+            <div class="col-sm-4">
+                <label class="form-label small">Name</label>
+                <input type="text" name="Name" value="@Model.Search.Name" class="form-control form-control-sm" />
+            </div>
+            <div class="col-sm-4">
+                <label class="form-label small">GR Number</label>
+                <input type="text" name="GRNumber" value="@Model.Search.GRNumber" class="form-control form-control-sm" />
+            </div>
+            <div class="col-sm-4">
+                <button type="submit" class="btn btn-sm btn-outline-primary"><i class="bi bi-search me-1"></i>Search</button>
+            </div>
+        </form>
+
+        @if (!Model.StudentResults.Any())
+        {
+            <p class="text-muted text-center py-3 mb-0">Search by name or GR number to see login status.</p>
+        }
+        else
+        {
+            <div class="table-responsive">
+                <table class="table align-middle">
+                    <thead>
+                        <tr>
+                            <th>Name</th>
+                            <th>GR Number</th>
+                            <th>Login</th>
+                            <th class="text-end">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var row in Model.StudentResults)
+                        {
+                            <tr>
+                                <td>@row.Student.FullName</td>
+                                <td>@row.Student.GRNumber</td>
+                                <td>
+                                    @if (row.HasLogin)
+                                    {
+                                        <span class="badge bg-success-subtle text-success">Active</span>
+                                    }
+                                    else
+                                    {
+                                        <span class="badge bg-secondary-subtle text-secondary">None</span>
+                                    }
+                                </td>
+                                <td class="text-end">
+                                    @if (!row.HasLogin)
+                                    {
+                                        <form asp-action="CreateStudentLogin" method="post" class="d-inline">
+                                            @Html.AntiForgeryToken()
+                                            <input type="hidden" name="studentId" value="@row.Student.Id" />
+                                            <button type="submit" class="btn btn-sm btn-outline-primary">
+                                                <i class="bi bi-key me-1"></i>Create Login
+                                            </button>
+                                        </form>
+                                    }
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        }
+    </div>
+</div>
+
+<div class="row g-3">
+    <div class="col-lg-7">
+        <div class="card border-0 shadow-sm">
+            <div class="card-header bg-white border-0 pt-3">
+                <h6 class="mb-0 fw-semibold"><i class="bi bi-people me-2 text-primary"></i>Parent Accounts</h6>
+            </div>
+            <div class="card-body">
+                @if (!Model.ParentLinks.Any())
+                {
+                    <p class="text-muted text-center py-3 mb-0">No parent accounts linked yet</p>
+                }
+                else
+                {
+                    <div class="table-responsive">
+                        <table class="table table-sm align-middle">
+                            <thead>
+                                <tr>
+                                    <th>Parent</th>
+                                    <th>Email</th>
+                                    <th>Linked Student</th>
+                                    <th></th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach (var link in Model.ParentLinks)
+                                {
+                                    <tr>
+                                        <td>@link.ParentName</td>
+                                        <td>@link.ParentEmail</td>
+                                        <td>@link.StudentName (@link.GRNumber)</td>
+                                        <td class="text-end">
+                                            <form asp-action="UnlinkParent" method="post" class="d-inline" onsubmit="return confirm('Remove this link?');">
+                                                @Html.AntiForgeryToken()
+                                                <input type="hidden" name="linkId" value="@link.LinkId" />
+                                                <button type="submit" class="btn btn-sm btn-outline-danger"><i class="bi bi-x-circle"></i></button>
+                                            </form>
+                                        </td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                }
+            </div>
+        </div>
+    </div>
+
+    <div class="col-lg-5">
+        <div class="card border-0 shadow-sm">
+            <div class="card-header bg-white border-0 pt-3">
+                <h6 class="mb-0 fw-semibold"><i class="bi bi-person-plus me-2 text-primary"></i>Link Parent Account</h6>
+            </div>
+            <div class="card-body">
+                <form asp-action="LinkParent" method="post">
+                    @Html.AntiForgeryToken()
+                    <div class="mb-3">
+                        <label class="form-label">Parent Name</label>
+                        <input asp-for="LinkForm.FullName" class="form-control" />
+                        <span asp-validation-for="LinkForm.FullName" class="text-danger small"></span>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Email</label>
+                        <input asp-for="LinkForm.Email" class="form-control" />
+                        <span asp-validation-for="LinkForm.Email" class="text-danger small"></span>
+                        <div class="form-text">If this email already has a parent login, the student is just added to it.</div>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Password</label>
+                        <input asp-for="LinkForm.Password" type="text" class="form-control" />
+                        <span asp-validation-for="LinkForm.Password" class="text-danger small"></span>
+                        <div class="form-text">Only used if creating a brand-new parent login.</div>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Student GR Number</label>
+                        <input asp-for="LinkForm.GRNumber" class="form-control" />
+                        <span asp-validation-for="LinkForm.GRNumber" class="text-danger small"></span>
+                    </div>
+                    <button type="submit" class="btn btn-primary w-100"><i class="bi bi-link-45deg me-1"></i>Link Account</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

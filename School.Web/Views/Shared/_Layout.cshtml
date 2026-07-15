@@ -212,6 +212,7 @@
                     <li><a class="nav-link" href="#"><i class="bi bi-calendar-check nav-icon"></i> Attendance</a></li>
                     <li><a class="nav-link" href="#"><i class="bi bi-file-earmark-person nav-icon"></i> Documents</a></li>
                     <li><a class="nav-link" href="#"><i class="bi bi-door-open nav-icon"></i> Leave Requests</a></li>
+                    <li><a class="nav-link" asp-area="SchoolAdmin" asp-controller="PortalAccounts" asp-action="Index"><i class="bi bi-shield-lock nav-icon"></i> Portal Accounts</a></li>
                 </ul>
             </li>
 
@@ -510,8 +511,7 @@
                     <i class="bi bi-chevron-down chevron"></i>
                 </a>
                 <ul class="collapse sub-nav list-unstyled" id="par-children">
-                    <li><a class="nav-link" href="#"><i class="bi bi-list-ul nav-icon"></i> My Children</a></li>
-                    <li><a class="nav-link" href="#"><i class="bi bi-file-earmark-person nav-icon"></i> Profile</a></li>
+                    <li><a class="nav-link" asp-area="Parent" asp-controller="Home" asp-action="Index"><i class="bi bi-list-ul nav-icon"></i> My Children</a></li>
                 </ul>
             </li>
 
@@ -521,8 +521,7 @@
                     <i class="bi bi-chevron-down chevron"></i>
                 </a>
                 <ul class="collapse sub-nav list-unstyled" id="par-attendance">
-                    <li><a class="nav-link" href="#"><i class="bi bi-eye nav-icon"></i> View Attendance</a></li>
-                    <li><a class="nav-link" href="#"><i class="bi bi-bar-chart nav-icon"></i> Monthly Summary</a></li>
+                    <li><a class="nav-link" asp-area="Parent" asp-controller="Home" asp-action="Index"><i class="bi bi-eye nav-icon"></i> View Attendance</a></li>
                 </ul>
             </li>
 
@@ -532,8 +531,8 @@
                     <i class="bi bi-chevron-down chevron"></i>
                 </a>
                 <ul class="collapse sub-nav list-unstyled" id="par-fees">
-                    <li><a class="nav-link" href="#"><i class="bi bi-clock-history nav-icon"></i> Pending Fees</a></li>
-                    <li><a class="nav-link" href="#"><i class="bi bi-receipt nav-icon"></i> Payment History</a></li>
+                    <li><a class="nav-link" asp-area="Parent" asp-controller="Home" asp-action="Index"><i class="bi bi-clock-history nav-icon"></i> Pending Fees</a></li>
+                    <li><a class="nav-link" asp-area="Parent" asp-controller="Home" asp-action="Index"><i class="bi bi-receipt nav-icon"></i> Payment History</a></li>
                 </ul>
             </li>
 
@@ -543,8 +542,17 @@
                     <i class="bi bi-chevron-down chevron"></i>
                 </a>
                 <ul class="collapse sub-nav list-unstyled" id="par-results">
-                    <li><a class="nav-link" href="#"><i class="bi bi-list-check nav-icon"></i> Exam Results</a></li>
-                    <li><a class="nav-link" href="#"><i class="bi bi-graph-up nav-icon"></i> Progress</a></li>
+                    <li><a class="nav-link" asp-area="Parent" asp-controller="Home" asp-action="Index"><i class="bi bi-list-check nav-icon"></i> Exam Results</a></li>
+                </ul>
+            </li>
+
+            <li>
+                <a class="nav-link" data-bs-toggle="collapse" href="#par-library" role="button" aria-expanded="false">
+                    <i class="bi bi-book nav-icon"></i> Library
+                    <i class="bi bi-chevron-down chevron"></i>
+                </a>
+                <ul class="collapse sub-nav list-unstyled" id="par-library">
+                    <li><a class="nav-link" asp-area="Parent" asp-controller="Home" asp-action="Index"><i class="bi bi-arrow-left-right nav-icon"></i> Issued Books</a></li>
                 </ul>
             </li>
         }
@@ -567,8 +575,7 @@
                     <i class="bi bi-chevron-down chevron"></i>
                 </a>
                 <ul class="collapse sub-nav list-unstyled" id="stu-attendance">
-                    <li><a class="nav-link" href="#"><i class="bi bi-eye nav-icon"></i> View Attendance</a></li>
-                    <li><a class="nav-link" href="#"><i class="bi bi-bar-chart nav-icon"></i> Monthly Report</a></li>
+                    <li><a class="nav-link" asp-area="Student" asp-controller="Attendance" asp-action="Index"><i class="bi bi-eye nav-icon"></i> View Attendance</a></li>
                 </ul>
             </li>
 
@@ -578,8 +585,7 @@
                     <i class="bi bi-chevron-down chevron"></i>
                 </a>
                 <ul class="collapse sub-nav list-unstyled" id="stu-exams">
-                    <li><a class="nav-link" href="#"><i class="bi bi-calendar3 nav-icon"></i> Exam Schedule</a></li>
-                    <li><a class="nav-link" href="#"><i class="bi bi-list-check nav-icon"></i> My Results</a></li>
+                    <li><a class="nav-link" asp-area="Student" asp-controller="Results" asp-action="Index"><i class="bi bi-list-check nav-icon"></i> My Results</a></li>
                     <li><a class="nav-link" href="#"><i class="bi bi-patch-question nav-icon"></i> MCQ Tests</a></li>
                 </ul>
             </li>
@@ -590,8 +596,7 @@
                     <i class="bi bi-chevron-down chevron"></i>
                 </a>
                 <ul class="collapse sub-nav list-unstyled" id="stu-library">
-                    <li><a class="nav-link" href="#"><i class="bi bi-bookshelf nav-icon"></i> Browse Books</a></li>
-                    <li><a class="nav-link" href="#"><i class="bi bi-arrow-left-right nav-icon"></i> Issued Books</a></li>
+                    <li><a class="nav-link" asp-area="Student" asp-controller="Library" asp-action="Index"><i class="bi bi-arrow-left-right nav-icon"></i> Issued Books</a></li>
                 </ul>
             </li>
 
@@ -601,8 +606,8 @@
                     <i class="bi bi-chevron-down chevron"></i>
                 </a>
                 <ul class="collapse sub-nav list-unstyled" id="stu-fees">
-                    <li><a class="nav-link" href="#"><i class="bi bi-clock-history nav-icon"></i> Pending Fees</a></li>
-                    <li><a class="nav-link" href="#"><i class="bi bi-receipt nav-icon"></i> Payment History</a></li>
+                    <li><a class="nav-link" asp-area="Student" asp-controller="Fees" asp-action="Index"><i class="bi bi-clock-history nav-icon"></i> Pending Fees</a></li>
+                    <li><a class="nav-link" asp-area="Student" asp-controller="Fees" asp-action="Index"><i class="bi bi-receipt nav-icon"></i> Payment History</a></li>
                 </ul>
             </li>
 

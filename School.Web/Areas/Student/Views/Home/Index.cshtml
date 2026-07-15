@@ -1,11 +1,24 @@
-@{ ViewData["Title"] = "Student Portal"; }
+@model School.Web.Models.StudentPortal.StudentDashboardViewModel
+@{
+    ViewData["Title"] = "Student Portal";
+    var attendancePct = Model.AttendanceSummary.TotalDays > 0
+        ? (Model.AttendanceSummary.PresentDays * 100.0 / Model.AttendanceSummary.TotalDays)
+        : 0;
+}
+
+<div class="card border-0 shadow-sm mb-3">
+    <div class="card-body">
+        <h6 class="fw-semibold mb-1"><i class="bi bi-person-circle me-2 text-primary"></i>@Model.Student.FullName</h6>
+        <div class="text-muted small">GR No. @Model.Student.GRNumber &middot; Roll No. @Model.Student.RollNumber</div>
+    </div>
+</div>
 
 <div class="row g-3 mb-4">
     @foreach (var stat in new[] {
-        ("bi-calendar-check", "bg-success", "Attendance %",    "0%"),
-        ("bi-award",          "bg-primary", "Latest Result",   "—"),
-        ("bi-cash-stack",     "bg-warning", "Pending Fees",    "₹0"),
-        ("bi-book",           "bg-info",    "Books Issued",    "0"),
+        ("bi-calendar-check", "bg-success", "Attendance (this month)", $"{attendancePct:N0}%"),
+        ("bi-award",          "bg-primary", "Latest Result",   Model.LatestResult is null ? "—" : $"{Model.LatestResult.Percentage:N1}% ({Model.LatestResult.Grade})"),
+        ("bi-cash-stack",     "bg-warning", "Pending Fees",    $"₹{Model.Pending.PendingAmount:N2}"),
+        ("bi-book",           "bg-info",    "Books Issued",    Model.ActiveIssuesCount.ToString()),
     })
     {
         <div class="col-sm-6 col-xl-3">
@@ -26,10 +39,29 @@
 
 <div class="card border-0 shadow-sm">
     <div class="card-header bg-white border-0 pt-3">
-        <h6 class="mb-0 fw-semibold"><i class="bi bi-calendar3 me-2 text-primary"></i>Today's Timetable</h6>
+        <h6 class="mb-0 fw-semibold"><i class="bi bi-award me-2 text-primary"></i>Latest Exam</h6>
     </div>
-    <div class="card-body text-center text-muted py-5">
-        <i class="bi bi-calendar3" style="font-size:2.5rem;opacity:.3"></i>
-        <p class="mt-2 mb-0">No timetable available</p>
+    <div class="card-body">
+        @if (Model.LatestExamName is null)
+        {
+            <div class="text-center text-muted py-4">
+                <i class="bi bi-award" style="font-size:2.5rem;opacity:.3"></i>
+                <p class="mt-2 mb-0">No published results yet</p>
+            </div>
+        }
+        else
+        {
+            <p class="mb-1"><strong>@Model.LatestExamName</strong></p>
+            @if (Model.LatestResult is not null)
+            {
+                <p class="text-muted mb-0">
+                    Total: @Model.LatestResult.TotalMarks.ToString("N2") &middot;
+                    @Model.LatestResult.Percentage.ToString("N2")% &middot;
+                    Grade @Model.LatestResult.Grade &middot;
+                    @(Model.LatestResult.IsPass ? "Pass" : "Fail")
+                </p>
+            }
+            <a asp-action="Index" asp-controller="Results" class="btn btn-sm btn-outline-primary mt-2">View All Results</a>
+        }
     </div>
 </div>

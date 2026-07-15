@@ -1,0 +1,105 @@
+@model School.Web.Models.ParentPortal.ParentChildAttendanceViewModel
+@{ ViewData["Title"] = "Attendance"; }
+
+<div class="card border-0 shadow-sm mb-3">
+    <div class="card-body d-flex justify-content-between align-items-center">
+        <h6 class="mb-0 fw-semibold"><i class="bi bi-person-circle me-2 text-primary"></i>@Model.Student.FullName</h6>
+        <a asp-controller="Home" asp-action="Child" asp-route-studentId="@Model.Student.Id" class="btn btn-outline-secondary btn-sm">Back to Overview</a>
+    </div>
+</div>
+
+<div class="card border-0 shadow-sm mb-3">
+    <div class="card-body">
+        <form method="get" class="row g-2 align-items-end">
+            <input type="hidden" name="studentId" value="@Model.Student.Id" />
+            <div class="col-sm-4">
+                <label class="form-label small">From</label>
+                <input type="date" name="from" value="@Model.From.ToString("yyyy-MM-dd")" class="form-control form-control-sm" />
+            </div>
+            <div class="col-sm-4">
+                <label class="form-label small">To</label>
+                <input type="date" name="to" value="@Model.To.ToString("yyyy-MM-dd")" class="form-control form-control-sm" />
+            </div>
+            <div class="col-sm-4">
+                <button type="submit" class="btn btn-sm btn-outline-primary"><i class="bi bi-funnel me-1"></i>Filter</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<div class="row g-3 mb-4">
+    @foreach (var stat in new[] {
+        ("bi-calendar3",       "bg-primary", "Total Days",  Model.Summary.TotalDays.ToString()),
+        ("bi-check2-circle",   "bg-success", "Present",     Model.Summary.PresentDays.ToString()),
+        ("bi-x-circle",        "bg-danger",  "Absent",      Model.Summary.AbsentDays.ToString()),
+        ("bi-clock-history",   "bg-warning", "Late",        Model.Summary.LateCount.ToString()),
+    })
+    {
+        <div class="col-sm-6 col-xl-3">
+            <div class="card border-0 shadow-sm h-100">
+                <div class="card-body d-flex align-items-center gap-3">
+                    <div class="rounded-3 p-3 @stat.Item2 bg-opacity-10">
+                        <i class="bi @stat.Item1 @stat.Item2.Replace("bg-","text-") fs-3"></i>
+                    </div>
+                    <div>
+                        <div class="text-muted small">@stat.Item3</div>
+                        <div class="fw-bold fs-4">@stat.Item4</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    }
+</div>
+
+<div class="card border-0 shadow-sm">
+    <div class="card-header bg-white border-0 pt-3">
+        <h6 class="mb-0 fw-semibold"><i class="bi bi-calendar-check me-2 text-primary"></i>Daily Records</h6>
+    </div>
+    <div class="card-body">
+        @if (!Model.Entries.Any())
+        {
+            <p class="text-muted text-center py-3 mb-0">No attendance records in this date range</p>
+        }
+        else
+        {
+            <div class="table-responsive">
+                <table class="table table-sm align-middle">
+                    <thead>
+                        <tr>
+                            <th>Date</th>
+                            <th>Status</th>
+                            <th>Remark</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var e in Model.Entries.OrderByDescending(x => x.Date))
+                        {
+                            <tr>
+                                <td>@e.Date.ToString("dd MMM yyyy")</td>
+                                <td>
+                                    @if (!e.IsPresent)
+                                    {
+                                        <span class="badge bg-danger-subtle text-danger">Absent</span>
+                                    }
+                                    else if (e.IsHalfDay)
+                                    {
+                                        <span class="badge bg-warning-subtle text-warning">Half Day</span>
+                                    }
+                                    else if (e.IsLate)
+                                    {
+                                        <span class="badge bg-warning-subtle text-warning">Late</span>
+                                    }
+                                    else
+                                    {
+                                        <span class="badge bg-success-subtle text-success">Present</span>
+                                    }
+                                </td>
+                                <td>@e.Remark</td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        }
+    </div>
+</div>

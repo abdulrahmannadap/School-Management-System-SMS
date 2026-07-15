@@ -1,6 +1,9 @@
+using School.Application.Common;
 using School.Application.DTOs.Student;
 using School.Application.Interfaces;
+using School.Domain.Entities;
 using School.Domain.Entities.Student;
+using School.Domain.Enums;
 
 namespace School.Application.Services.Student;
 
@@ -15,7 +18,8 @@ public class StudentService(
     IGenericRepository<StudentDocument>                  documentRepo,
     IGenericRepository<StudentLeaveRequest>              leaveRepo,
     IGenericRepository<StudentRfid>                      rfidRepo,
-    IGenericRepository<ParentAppStatus>                  parentAppRepo) : IStudentService
+    IGenericRepository<ParentAppStatus>                  parentAppRepo,
+    IGenericRepository<User>                             userRepo) : IStudentService
 {
     // ── Core ─────────────────────────────────────────────────
 
@@ -80,6 +84,18 @@ public class StudentService(
             await parentRepo.AddAsync(parent, ct);
             await parentRepo.SaveChangesAsync(ct);
         }
+
+        // auto-create a portal login for the student
+        await userRepo.AddAsync(new User
+        {
+            FullName     = entity.FullName,
+            Email        = $"{entity.GRNumber}@student.local",
+            PasswordHash = PasswordHasher.Hash(entity.GRNumber),
+            Role         = UserRole.Student,
+            IsActive     = true,
+            StudentId    = entity.Id
+        }, ct);
+        await userRepo.SaveChangesAsync(ct);
 
         return MapStudent(entity);
     }

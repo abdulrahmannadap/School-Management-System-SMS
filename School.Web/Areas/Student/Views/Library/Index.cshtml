@@ -1,0 +1,85 @@
+@model School.Web.Models.StudentPortal.StudentLibraryViewModel
+@{ ViewData["Title"] = "Library"; }
+
+<div class="row g-3">
+    <div class="col-lg-6">
+        <div class="card border-0 shadow-sm">
+            <div class="card-header bg-white border-0 pt-3">
+                <h6 class="mb-0 fw-semibold"><i class="bi bi-journal-bookmark me-2 text-primary"></i>Currently Issued</h6>
+            </div>
+            <div class="card-body">
+                @if (!Model.ActiveIssues.Any())
+                {
+                    <p class="text-muted text-center py-3 mb-0">No books currently issued</p>
+                }
+                else
+                {
+                    <div class="table-responsive">
+                        <table class="table table-sm align-middle">
+                            <thead>
+                                <tr>
+                                    <th>Book</th>
+                                    <th>Issue Date</th>
+                                    <th>Due Date</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach (var issue in Model.ActiveIssues)
+                                {
+                                    var isOverdue = issue.DueDate.Date < DateTime.Today;
+                                    <tr>
+                                        <td>@issue.BookTitle</td>
+                                        <td>@issue.IssueDate.ToString("dd MMM yyyy")</td>
+                                        <td>
+                                            @issue.DueDate.ToString("dd MMM yyyy")
+                                            @if (isOverdue)
+                                            {
+                                                <span class="badge bg-danger-subtle text-danger ms-1">Overdue</span>
+                                            }
+                                        </td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                }
+            </div>
+        </div>
+    </div>
+
+    <div class="col-lg-6">
+        <div class="card border-0 shadow-sm">
+            <div class="card-header bg-white border-0 pt-3">
+                <h6 class="mb-0 fw-semibold"><i class="bi bi-clock-history me-2 text-primary"></i>Past Issues</h6>
+            </div>
+            <div class="card-body">
+                @if (!Model.History.Any())
+                {
+                    <p class="text-muted text-center py-3 mb-0">No return history yet</p>
+                }
+                else
+                {
+                    <div class="table-responsive">
+                        <table class="table table-sm align-middle">
+                            <thead>
+                                <tr>
+                                    <th>Book</th>
+                                    <th>Issue Date</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach (var issue in Model.History)
+                                {
+                                    <tr>
+                                        <td>@issue.BookTitle</td>
+                                        <td>@issue.IssueDate.ToString("dd MMM yyyy")</td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                }
+            </div>
+        </div>
+    </div>
+</div>

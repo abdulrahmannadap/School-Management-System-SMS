@@ -35,6 +35,7 @@ public class AppDbContext(DbContextOptions<AppDbContext> options) : DbContext(op
     public DbSet<StudentLeaveRequest>StudentLeaveRequests => Set<StudentLeaveRequest>();
     public DbSet<StudentRfid>        StudentRfids       => Set<StudentRfid>();
     public DbSet<ParentAppStatus>    ParentAppStatuses  => Set<ParentAppStatus>();
+    public DbSet<ParentStudentLink>  ParentStudentLinks => Set<ParentStudentLink>();
 
     // ── Staff ───────────────────────────────────────────────
     public DbSet<Staff>              StaffMembers       => Set<Staff>();

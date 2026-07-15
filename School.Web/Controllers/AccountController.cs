@@ -2,13 +2,12 @@ using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using School.Application.Common;
 using School.Application.Interfaces;
 using School.Domain.Enums;
 using School.Persistence;
 using School.Web.Models;
 using System.Security.Claims;
-using System.Security.Cryptography;
-using System.Text;
 
 namespace School.Web.Controllers;
 
@@ -28,7 +27,7 @@ public class AccountController(AppDbContext db, IJwtService jwtService) : Contro
     {
         if (!ModelState.IsValid) return View(model);
 
-        var hash = Hash(model.Password);
+        var hash = PasswordHasher.Hash(model.Password);
         var user = await db.Users.FirstOrDefaultAsync(u =>
             u.Email == model.Email && u.PasswordHash == hash && u.IsActive);
 
@@ -48,6 +47,9 @@ public class AccountController(AppDbContext db, IJwtService jwtService) : Contro
             new(ClaimTypes.Role,           user.Role.ToString()),
             new("jwt",                     jwt),
         };
+
+        if (user.Role == UserRole.Student && user.StudentId.HasValue)
+            claims.Add(new Claim("StudentId", user.StudentId.Value.ToString()));
 
         var identity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
         var principal = new ClaimsPrincipal(identity);
@@ -89,6 +91,4 @@ public class AccountController(AppDbContext db, IJwtService jwtService) : Contro
         };
     }
 
-    private static string Hash(string input) =>
-        Convert.ToBase64String(SHA256.HashData(Encoding.UTF8.GetBytes(input)));
 }

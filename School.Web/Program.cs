@@ -5,6 +5,7 @@ using School.Application.Services.Fees;
 using School.Application.Services.Inventory;
 using School.Application.Services.Library;
 using School.Application.Services.Masters;
+using School.Application.Services.Portal;
 using School.Application.Services.Staff;
 using School.Application.Services.Student;
 using School.Infrastructure.Services;
@@ -24,6 +25,7 @@ builder.Services.AddScoped<IFeesService, FeesService>();
 builder.Services.AddScoped<ILibraryService, LibraryService>();
 builder.Services.AddScoped<IInventoryService, InventoryService>();
 builder.Services.AddScoped<IExamService, ExamService>();
+builder.Services.AddScoped<IPortalAccountService, PortalAccountService>();
 builder.Services.AddHttpClient<IBookAggregatorService, BookAggregatorService>();
 
 builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)

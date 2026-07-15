@@ -290,7 +290,7 @@
                 </a>
                 <ul class="collapse sub-nav list-unstyled" id="adm-reports">
                     <li><a class="nav-link" href="#"><i class="bi bi-file-bar-chart nav-icon"></i> Academic</a></li>
-                    <li><a class="nav-link" href="#"><i class="bi bi-file-earmark-bar-graph nav-icon"></i> Financial</a></li>
+                    <li><a class="nav-link" asp-area="SchoolAdmin" asp-controller="Fees" asp-action="FeeAlerts"><i class="bi bi-file-earmark-bar-graph nav-icon"></i> Financial</a></li>
                     <li><a class="nav-link" href="#"><i class="bi bi-people nav-icon"></i> Attendance</a></li>
                 </ul>
             </li>
@@ -410,7 +410,7 @@
                     <i class="bi bi-chevron-down chevron"></i>
                 </a>
                 <ul class="collapse sub-nav list-unstyled" id="acc-banking">
-                    <li><a class="nav-link" href="#"><i class="bi bi-check2-circle nav-icon"></i> Cheques</a></li>
+                    <li><a class="nav-link" asp-area="Accountant" asp-controller="Fees" asp-action="Index"><i class="bi bi-check2-circle nav-icon"></i> Cheques</a></li>
                     <li><a class="nav-link" asp-area="Accountant" asp-controller="Fees" asp-action="Index"><i class="bi bi-safe nav-icon"></i> Deposits</a></li>
                     <li><a class="nav-link" asp-area="Accountant" asp-controller="Fees" asp-action="Vouchers"><i class="bi bi-file-earmark-text nav-icon"></i> Vouchers</a></li>
                 </ul>
@@ -436,9 +436,9 @@
                     <i class="bi bi-chevron-down chevron"></i>
                 </a>
                 <ul class="collapse sub-nav list-unstyled" id="acc-reports">
-                    <li><a class="nav-link" href="#"><i class="bi bi-file-bar-chart nav-icon"></i> Collection Report</a></li>
-                    <li><a class="nav-link" href="#"><i class="bi bi-file-earmark-bar-graph nav-icon"></i> Expense Report</a></li>
-                    <li><a class="nav-link" href="#"><i class="bi bi-graph-up nav-icon"></i> Day Book</a></li>
+                    <li><a class="nav-link" asp-area="Accountant" asp-controller="Fees" asp-action="Reports"><i class="bi bi-file-bar-chart nav-icon"></i> Collection Report</a></li>
+                    <li><a class="nav-link" asp-area="Accountant" asp-controller="Fees" asp-action="Reports"><i class="bi bi-file-earmark-bar-graph nav-icon"></i> Expense Report</a></li>
+                    <li><a class="nav-link" asp-area="Accountant" asp-controller="Fees" asp-action="Reports"><i class="bi bi-graph-up nav-icon"></i> Day Book</a></li>
                 </ul>
             </li>
         }

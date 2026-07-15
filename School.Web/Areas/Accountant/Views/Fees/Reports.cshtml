@@ -1,0 +1,103 @@
+@model School.Web.Models.Fees.ReportsViewModel
+@{ ViewData["Title"] = "Reports"; }
+
+<div class="row g-3 mb-4">
+    <div class="col-md-6">
+        <div class="card border-0 shadow-sm h-100">
+            <div class="card-header bg-white border-0 pt-3">
+                <h6 class="mb-0 fw-semibold"><i class="bi bi-calendar-day me-2 text-primary"></i>Collection Summary</h6>
+            </div>
+            <div class="card-body">
+                <form method="get" class="row g-2 align-items-end mb-3">
+                    <input type="hidden" name="from" value="@Model.From.ToString("yyyy-MM-dd")" />
+                    <input type="hidden" name="to" value="@Model.To.ToString("yyyy-MM-dd")" />
+                    <div class="col-8">
+                        <label class="form-label small">Date</label>
+                        <input type="date" name="summaryDate" value="@Model.SummaryDate.ToString("yyyy-MM-dd")" class="form-control form-control-sm" />
+                    </div>
+                    <div class="col-4">
+                        <button type="submit" class="btn btn-sm btn-outline-primary w-100"><i class="bi bi-funnel"></i></button>
+                    </div>
+                </form>
+                <div class="d-flex justify-content-between border-top pt-2">
+                    <span class="text-muted">Total Collection</span>
+                    <span class="fw-bold">₹@Model.CollectionSummary.TotalCollection.ToString("N2")</span>
+                </div>
+                <div class="d-flex justify-content-between border-top pt-2 mt-2">
+                    <span class="text-muted">Transactions</span>
+                    <span class="fw-bold">@Model.CollectionSummary.TotalTransactions</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-6">
+        <div class="card border-0 shadow-sm h-100">
+            <div class="card-header bg-white border-0 pt-3">
+                <h6 class="mb-0 fw-semibold"><i class="bi bi-graph-up-arrow me-2 text-primary"></i>Income / Expense</h6>
+            </div>
+            <div class="card-body">
+                <form method="get" class="row g-2 align-items-end mb-3">
+                    <input type="hidden" name="summaryDate" value="@Model.SummaryDate.ToString("yyyy-MM-dd")" />
+                    <div class="col-5">
+                        <label class="form-label small">From</label>
+                        <input type="date" name="from" value="@Model.From.ToString("yyyy-MM-dd")" class="form-control form-control-sm" />
+                    </div>
+                    <div class="col-5">
+                        <label class="form-label small">To</label>
+                        <input type="date" name="to" value="@Model.To.ToString("yyyy-MM-dd")" class="form-control form-control-sm" />
+                    </div>
+                    <div class="col-2">
+                        <button type="submit" class="btn btn-sm btn-outline-primary w-100"><i class="bi bi-funnel"></i></button>
+                    </div>
+                </form>
+                <div class="d-flex justify-content-between border-top pt-2">
+                    <span class="text-muted">Total Income</span>
+                    <span class="fw-bold text-success">₹@Model.IncomeExpense.TotalIncome.ToString("N2")</span>
+                </div>
+                <div class="d-flex justify-content-between border-top pt-2 mt-2">
+                    <span class="text-muted">Total Expense</span>
+                    <span class="fw-bold text-danger">₹@Model.IncomeExpense.TotalExpense.ToString("N2")</span>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="card border-0 shadow-sm">
+    <div class="card-header bg-white border-0 pt-3">
+        <h6 class="mb-0 fw-semibold"><i class="bi bi-receipt me-2 text-primary"></i>Payment Report (@Model.From.ToString("dd MMM yyyy") &ndash; @Model.To.ToString("dd MMM yyyy"))</h6>
+    </div>
+    <div class="card-body">
+        @if (!Model.Payments.Any())
+        {
+            <p class="text-muted text-center py-3 mb-0">No payments in this date range</p>
+        }
+        else
+        {
+            <div class="table-responsive">
+                <table class="table table-sm align-middle">
+                    <thead>
+                        <tr>
+                            <th>Student ID</th>
+                            <th>Date</th>
+                            <th>Mode</th>
+                            <th class="text-end">Amount</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var p in Model.Payments)
+                        {
+                            <tr>
+                                <td>@p.StudentId</td>
+                                <td>@p.PaymentDate.ToString("dd MMM yyyy")</td>
+                                <td>@p.PaymentMode</td>
+                                <td class="text-end">₹@p.Amount.ToString("N2")</td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        }
+    </div>
+</div>

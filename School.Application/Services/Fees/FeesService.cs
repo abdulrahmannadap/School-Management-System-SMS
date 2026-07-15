@@ -366,6 +366,7 @@ public class FeesService(
         return list.OrderByDescending(c => c.ChequeDate)
                    .Select(c => new ChequeDto
                    {
+                       Id         = c.Id,
                        StudentId  = c.StudentId,
                        ChequeNo   = c.ChequeNo,
                        ChequeDate = c.ChequeDate,

@@ -230,7 +230,7 @@
             </div>
         </div>
 
-        <div class="card border-0 shadow-sm">
+        <div class="card border-0 shadow-sm mb-3">
             <div class="card-header bg-white border-0 pt-3">
                 <h6 class="mb-0 fw-semibold"><i class="bi bi-safe me-2 text-primary"></i>Deposit</h6>
             </div>
@@ -289,6 +289,65 @@
                         <button type="submit" class="btn btn-outline-secondary btn-sm w-100">Record Deposit</button>
                     </form>
                 }
+            </div>
+        </div>
+
+        <div class="card border-0 shadow-sm">
+            <div class="card-header bg-white border-0 pt-3">
+                <h6 class="mb-0 fw-semibold"><i class="bi bi-check2-circle me-2 text-primary"></i>Cheques</h6>
+            </div>
+            <div class="card-body">
+                @if (Model.Cheques.Any())
+                {
+                    <div class="table-responsive mb-3">
+                        <table class="table table-sm align-middle mb-0">
+                            <thead><tr><th>Cheque No.</th><th>Date</th><th class="text-end">Amount</th><th>Status</th></tr></thead>
+                            <tbody>
+                                @foreach (var c in Model.Cheques)
+                                {
+                                    <tr>
+                                        <td>@c.ChequeNo</td>
+                                        <td>@c.ChequeDate.ToString("dd MMM yyyy")</td>
+                                        <td class="text-end">₹@c.Amount.ToString("N2")</td>
+                                        <td>
+                                            <form asp-action="UpdateChequeStatus" method="post" class="d-inline">
+                                                @Html.AntiForgeryToken()
+                                                <input type="hidden" name="chequeId" value="@c.Id" />
+                                                <input type="hidden" name="studentId" value="@Model.Student.Id" />
+                                                <input type="hidden" name="isCleared" value="@((!c.IsCleared).ToString())" />
+                                                @if (c.IsCleared)
+                                                {
+                                                    <button type="submit" class="btn btn-sm btn-outline-success">Cleared</button>
+                                                }
+                                                else
+                                                {
+                                                    <button type="submit" class="btn btn-sm btn-outline-warning">Pending</button>
+                                                }
+                                            </form>
+                                        </td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                }
+                <form asp-action="AddCheque" method="post">
+                    @Html.AntiForgeryToken()
+                    <input type="hidden" asp-for="ChequeForm.StudentId" />
+                    <div class="mb-2">
+                        <input asp-for="ChequeForm.ChequeNo" class="form-control form-control-sm" placeholder="Cheque No." />
+                        <span asp-validation-for="ChequeForm.ChequeNo" class="text-danger small"></span>
+                    </div>
+                    <div class="mb-2">
+                        <input asp-for="ChequeForm.ChequeDate" type="date" class="form-control form-control-sm" />
+                        <span asp-validation-for="ChequeForm.ChequeDate" class="text-danger small"></span>
+                    </div>
+                    <div class="mb-2">
+                        <input asp-for="ChequeForm.Amount" type="number" step="0.01" class="form-control form-control-sm" placeholder="Amount" />
+                        <span asp-validation-for="ChequeForm.Amount" class="text-danger small"></span>
+                    </div>
+                    <button type="submit" class="btn btn-outline-secondary btn-sm w-100">Add Cheque</button>
+                </form>
             </div>
         </div>
     </div>

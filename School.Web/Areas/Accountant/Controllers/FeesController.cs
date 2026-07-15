@@ -142,6 +142,59 @@ public class FeesController(IFeesService feesSvc, IStudentService studentSvc) : 
         return RedirectToAction(nameof(Collect), new { studentId = form.StudentId });
     }
 
+    [HttpPost]
+    [ValidateAntiForgeryToken]
+    public async Task<IActionResult> AddCheque(ChequeFormModel form, CancellationToken ct)
+    {
+        if (!ModelState.IsValid)
+        {
+            var student = await studentSvc.GetAsync(form.StudentId, ct);
+            if (student is null) return NotFound();
+
+            ViewData["Title"] = "Collect Fee";
+            var vm = await BuildViewModel(student, ct);
+            vm.ChequeForm = form;
+            return View("Collect", vm);
+        }
+
+        await feesSvc.AddChequeAsync(new ChequeDto
+        {
+            StudentId  = form.StudentId,
+            ChequeNo   = form.ChequeNo,
+            ChequeDate = form.ChequeDate,
+            Amount     = form.Amount,
+            IsCleared  = false
+        }, ct);
+
+        TempData["Success"] = $"Cheque #{form.ChequeNo} recorded.";
+        return RedirectToAction(nameof(Collect), new { studentId = form.StudentId });
+    }
+
+    [HttpPost]
+    [ValidateAntiForgeryToken]
+    public async Task<IActionResult> UpdateChequeStatus(int chequeId, int studentId, bool isCleared, CancellationToken ct)
+    {
+        await feesSvc.UpdateChequeStatusAsync(chequeId, isCleared, ct);
+        TempData["Success"] = isCleared ? "Cheque marked as cleared." : "Cheque marked as pending.";
+        return RedirectToAction(nameof(Collect), new { studentId });
+    }
+
+    public async Task<IActionResult> Reports(DateTime? summaryDate, DateTime? from, DateTime? to, CancellationToken ct)
+    {
+        ViewData["Title"] = "Reports";
+
+        var vm = new ReportsViewModel();
+        if (summaryDate.HasValue) vm.SummaryDate = summaryDate.Value;
+        if (from.HasValue) vm.From = from.Value;
+        if (to.HasValue) vm.To = to.Value;
+
+        vm.CollectionSummary = await feesSvc.GetCollectionSummaryAsync(vm.SummaryDate, ct);
+        vm.Payments          = await feesSvc.GetPaymentReportAsync(vm.From, vm.To, ct);
+        vm.IncomeExpense     = await feesSvc.GetIncomeExpenseAsync(vm.From, vm.To, ct);
+
+        return View(vm);
+    }
+
     public async Task<IActionResult> Vouchers(DateTime? from, DateTime? to, CancellationToken ct)
     {
         ViewData["Title"] = "Vouchers";
@@ -196,7 +249,9 @@ public class FeesController(IFeesService feesSvc, IStudentService studentSvc) : 
             RefundForm          = new FeeRefundFormModel { StudentId = student.Id },
             DepositTransactions = await feesSvc.GetDepositTransactionsAsync(student.Id, ct),
             DepositMasters      = await feesSvc.GetDepositMastersAsync(ct),
-            DepositForm         = new DepositTransactionFormModel { StudentId = student.Id }
+            DepositForm         = new DepositTransactionFormModel { StudentId = student.Id },
+            Cheques             = await feesSvc.GetChequesAsync(student.Id, ct),
+            ChequeForm          = new ChequeFormModel { StudentId = student.Id }
         };
     }
 }

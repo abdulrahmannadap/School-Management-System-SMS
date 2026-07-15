@@ -140,6 +140,39 @@ public class FeesController(IFeesService feesSvc, IMastersService mastersSvc, IS
         return RedirectToAction(nameof(DepositMasters));
     }
 
+    public async Task<IActionResult> FeeAlerts(int? classId, int? financialYearId, CancellationToken ct)
+    {
+        ViewData["Title"] = "Fee Alerts";
+
+        var vm = new FeeAlertsViewModel
+        {
+            Classes                 = await mastersSvc.GetClassesAsync(ct),
+            FinancialYears          = await mastersSvc.GetFinancialYearsAsync(ct),
+            SelectedClassId         = classId,
+            SelectedFinancialYearId = financialYearId
+        };
+
+        if (classId.HasValue && financialYearId.HasValue)
+        {
+            var alerts = await feesSvc.GetFeeAlertsAsync(classId.Value, financialYearId.Value, ct);
+            var items = new List<FeeAlertItem>();
+            foreach (var alert in alerts)
+            {
+                var student = await studentSvc.GetAsync(alert.StudentId, ct);
+                items.Add(new FeeAlertItem
+                {
+                    StudentId   = alert.StudentId,
+                    StudentName = student?.FullName ?? "—",
+                    GRNumber    = student?.GRNumber ?? "—",
+                    Message     = alert.Message
+                });
+            }
+            vm.Alerts = items;
+        }
+
+        return View(vm);
+    }
+
     private async Task<ApplyFeeViewModel> BuildApplyViewModel(FeeMasterDto feeMaster, CancellationToken ct)
     {
         var classes = await mastersSvc.GetClassesAsync(ct);

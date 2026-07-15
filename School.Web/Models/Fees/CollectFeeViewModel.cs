@@ -20,4 +20,7 @@ public class CollectFeeViewModel
     public IReadOnlyList<DepositTransactionDto> DepositTransactions { get; set; } = [];
     public IReadOnlyList<DepositMasterDto> DepositMasters { get; set; } = [];
     public DepositTransactionFormModel DepositForm { get; set; } = new();
+
+    public IReadOnlyList<ChequeDto> Cheques { get; set; } = [];
+    public ChequeFormModel ChequeForm { get; set; } = new();
 }

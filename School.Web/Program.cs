@@ -36,6 +36,7 @@ builder.Services.AddScoped<ISchoolService, SchoolService>();
 builder.Services.AddScoped<ISystemReportService, SystemReportService>();
 builder.Services.AddHttpClient<IBookAggregatorService, BookAggregatorService>();
 
+builder.Services.AddMemoryCache();
 builder.Services.AddDistributedMemoryCache();
 builder.Services.AddSession(o =>
 {

@@ -52,8 +52,15 @@ public class StaffService(
         return entity is null ? null : MapStaff(entity);
     }
 
+    private static readonly Domain.Enums.UserRole[] StaffLoginRoles =
+        [Domain.Enums.UserRole.Teacher, Domain.Enums.UserRole.Accountant, Domain.Enums.UserRole.Staff];
+
     public async Task<StaffBaseDto> CreateAsync(CreateStaffDto dto, CancellationToken ct = default)
     {
+        if (!StaffLoginRoles.Contains(dto.LoginRole))
+            throw new ArgumentOutOfRangeException(nameof(dto.LoginRole), dto.LoginRole,
+                "Staff logins may only be Teacher, Accountant, or Staff.");
+
         var empCode = await GenerateEmployeeCodeAsync(ct);
         var entity = new Domain.Entities.Staff.Staff
         {
@@ -68,18 +75,29 @@ public class StaffService(
         await staffRepo.AddAsync(entity, ct);
         await staffRepo.SaveChangesAsync(ct);
 
-        // auto-create a portal login for the staff member
-        await userRepo.AddAsync(new User
+        // auto-create a portal login for the staff member; User.StaffId needs the
+        // DB-generated Staff.Id, so this can't share one SaveChanges with the insert
+        // above — if it fails, roll back the staff row rather than leave an orphan.
+        try
         {
-            FullName     = entity.FullName,
-            Email        = $"staff{entity.Id}@staff.local",
-            PasswordHash = PasswordHasher.Hash(entity.EmployeeCode),
-            Role         = dto.LoginRole,
-            IsActive     = true,
-            StaffId      = entity.Id,
-            SchoolId     = entity.SchoolId
-        }, ct);
-        await userRepo.SaveChangesAsync(ct);
+            await userRepo.AddAsync(new User
+            {
+                FullName     = entity.FullName,
+                Email        = $"staff{empCode}@staff.local",
+                PasswordHash = PasswordHasher.Hash(empCode),
+                Role         = dto.LoginRole,
+                IsActive     = true,
+                StaffId      = entity.Id,
+                SchoolId     = entity.SchoolId
+            }, ct);
+            await userRepo.SaveChangesAsync(ct);
+        }
+        catch
+        {
+            staffRepo.Delete(entity);
+            await staffRepo.SaveChangesAsync(ct);
+            throw;
+        }
 
         return MapStaff(entity);
     }

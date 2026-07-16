@@ -31,8 +31,16 @@ public class PortalAccountsController(IPortalAccountService portalSvc, IStudentS
     [ValidateAntiForgeryToken]
     public async Task<IActionResult> CreateStaffLogin(int staffId, UserRole role, CancellationToken ct)
     {
-        var created = await portalSvc.CreateStaffLoginAsync(staffId, role, ct);
-        TempData["Success"] = created ? "Staff login created." : "Staff member already has a login.";
+        try
+        {
+            var created = await portalSvc.CreateStaffLoginAsync(staffId, role, ct);
+            TempData["Success"] = created ? "Staff login created." : "Staff member already has a login.";
+        }
+        catch (ArgumentOutOfRangeException)
+        {
+            TempData["Error"] = "Invalid login role.";
+        }
+
         return RedirectToAction(nameof(Index));
     }
 
@@ -96,19 +104,19 @@ public class PortalAccountsController(IPortalAccountService portalSvc, IStudentS
         if (!string.IsNullOrWhiteSpace(search.Name) || !string.IsNullOrWhiteSpace(search.GRNumber))
         {
             var students = await studentSvc.SearchAsync(search, ct);
-            var rows = new List<StudentLoginRow>();
-            foreach (var s in students)
-                rows.Add(new StudentLoginRow { Student = s, HasLogin = await portalSvc.HasStudentLoginAsync(s.Id, ct) });
-            vm.StudentResults = rows;
+            var withLogin = await portalSvc.GetStudentIdsWithLoginAsync(students.Select(s => s.Id), ct);
+            vm.StudentResults = students
+                .Select(s => new StudentLoginRow { Student = s, HasLogin = withLogin.Contains(s.Id) })
+                .ToList();
         }
 
         if (!string.IsNullOrWhiteSpace(staffName) || !string.IsNullOrWhiteSpace(staffCode))
         {
             var staff = await staffSvc.SearchAsync(new StaffSearchDto { Name = staffName, EmployeeCode = staffCode }, ct);
-            var rows = new List<StaffLoginRow>();
-            foreach (var s in staff)
-                rows.Add(new StaffLoginRow { Staff = s, HasLogin = await portalSvc.HasStaffLoginAsync(s.Id, ct) });
-            vm.StaffResults = rows;
+            var withLogin = await portalSvc.GetStaffIdsWithLoginAsync(staff.Select(s => s.Id), ct);
+            vm.StaffResults = staff
+                .Select(s => new StaffLoginRow { Staff = s, HasLogin = withLogin.Contains(s.Id) })
+                .ToList();
         }
 
         return vm;

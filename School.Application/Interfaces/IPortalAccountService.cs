@@ -11,6 +11,12 @@ public interface IPortalAccountService
     Task<bool> HasStaffLoginAsync(int staffId, CancellationToken ct = default);
     Task<bool> CreateStaffLoginAsync(int staffId, UserRole role, CancellationToken ct = default);
 
+    /// <summary>Batched membership check — returns the subset of the given ids that already have a login.</summary>
+    Task<HashSet<int>> GetStudentIdsWithLoginAsync(IEnumerable<int> studentIds, CancellationToken ct = default);
+
+    /// <summary>Batched membership check — returns the subset of the given ids that already have a login.</summary>
+    Task<HashSet<int>> GetStaffIdsWithLoginAsync(IEnumerable<int> staffIds, CancellationToken ct = default);
+
     Task<IReadOnlyList<LinkedStudentDto>> GetLinkedStudentsAsync(Guid parentUserId, CancellationToken ct = default);
     Task<bool>                            IsStudentLinkedToParentAsync(Guid parentUserId, int studentId, CancellationToken ct = default);
 

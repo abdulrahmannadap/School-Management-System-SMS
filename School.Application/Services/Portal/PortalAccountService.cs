@@ -16,6 +16,26 @@ public class PortalAccountService(
     public async Task<bool> HasStudentLoginAsync(int studentId, CancellationToken ct = default) =>
         await userRepo.AnyAsync(u => u.StudentId == studentId, ct);
 
+    public Task<HashSet<int>> GetStudentIdsWithLoginAsync(IEnumerable<int> studentIds, CancellationToken ct = default)
+    {
+        var ids = studentIds.ToList();
+        var withLogin = userRepo.QueryNoTracking()
+            .Where(u => u.StudentId != null && ids.Contains(u.StudentId.Value))
+            .Select(u => u.StudentId!.Value)
+            .ToList();
+        return Task.FromResult(withLogin.ToHashSet());
+    }
+
+    public Task<HashSet<int>> GetStaffIdsWithLoginAsync(IEnumerable<int> staffIds, CancellationToken ct = default)
+    {
+        var ids = staffIds.ToList();
+        var withLogin = userRepo.QueryNoTracking()
+            .Where(u => u.StaffId != null && ids.Contains(u.StaffId.Value))
+            .Select(u => u.StaffId!.Value)
+            .ToList();
+        return Task.FromResult(withLogin.ToHashSet());
+    }
+
     public async Task<bool> CreateStudentLoginAsync(int studentId, CancellationToken ct = default)
     {
         if (await HasStudentLoginAsync(studentId, ct))
@@ -41,8 +61,13 @@ public class PortalAccountService(
     public async Task<bool> HasStaffLoginAsync(int staffId, CancellationToken ct = default) =>
         await userRepo.AnyAsync(u => u.StaffId == staffId, ct);
 
+    private static readonly UserRole[] StaffLoginRoles = [UserRole.Teacher, UserRole.Accountant, UserRole.Staff];
+
     public async Task<bool> CreateStaffLoginAsync(int staffId, UserRole role, CancellationToken ct = default)
     {
+        if (!StaffLoginRoles.Contains(role))
+            throw new ArgumentOutOfRangeException(nameof(role), role, "Staff logins may only be Teacher, Accountant, or Staff.");
+
         if (await HasStaffLoginAsync(staffId, ct))
             return false;
 

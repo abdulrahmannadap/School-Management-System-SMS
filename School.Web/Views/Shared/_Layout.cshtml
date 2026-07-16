@@ -1,9 +1,21 @@
+@using Microsoft.Extensions.Caching.Memory
 @inject School.Application.Interfaces.ICurrentSchoolContext CurrentSchool
 @inject School.Application.Interfaces.ISchoolService SchoolSvc
+@inject Microsoft.Extensions.Caching.Memory.IMemoryCache SchoolNameCache
 @{
-    var effectiveSchoolName = CurrentSchool.SchoolId.HasValue
-        ? (await SchoolSvc.GetAsync(CurrentSchool.SchoolId.Value))?.Name ?? "Unknown School"
-        : "SMS Platform";
+    string effectiveSchoolName;
+    if (CurrentSchool.SchoolId is { } schoolId)
+    {
+        effectiveSchoolName = await SchoolNameCache.GetOrCreateAsync($"school-name:{schoolId}", async entry =>
+        {
+            entry.AbsoluteExpirationRelativeToNow = TimeSpan.FromMinutes(5);
+            return (await SchoolSvc.GetAsync(schoolId))?.Name ?? "Unknown School";
+        }) ?? "Unknown School";
+    }
+    else
+    {
+        effectiveSchoolName = "SMS Platform";
+    }
 }
 <!DOCTYPE html>
 <html lang="en">
@@ -196,7 +208,7 @@
         }
 
         @* ════════════ SCHOOL ADMIN ════════════ *@
-        @if (User.IsInRole("SchoolAdmin"))
+        @if (User.IsInRole("SchoolAdmin") || CurrentSchool.IsImpersonating)
         {
             <li><span class="nav-section">Main</span></li>
             <li>

@@ -57,6 +57,10 @@ public class AccountController(AppDbContext db, IJwtService jwtService) : Contro
         var identity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
         var principal = new ClaimsPrincipal(identity);
 
+        // Defense in depth: a stale impersonation session from a previous user on this
+        // browser must never carry over into a freshly authenticated identity.
+        HttpContext.Session.Clear();
+
         await HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, principal,
             new AuthenticationProperties { IsPersistent = false });
 
@@ -68,6 +72,7 @@ public class AccountController(AppDbContext db, IJwtService jwtService) : Contro
     public async Task<IActionResult> Logout()
     {
         await HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
+        HttpContext.Session.Clear();
         return RedirectToAction(nameof(Login));
     }
 

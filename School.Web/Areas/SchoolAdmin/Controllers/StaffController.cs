@@ -32,25 +32,33 @@ public class StaffController(IStaffService staffSvc) : Controller
             });
         }
 
-        if (form.Id == 0)
-            await staffSvc.CreateAsync(new CreateStaffDto
-            {
-                FullName    = form.FullName,
-                Mobile      = form.Mobile,
-                Designation = form.Designation,
-                JoiningDate = form.JoiningDate,
-                LoginRole   = form.LoginRole
-            }, ct);
-        else
-            await staffSvc.UpdateAsync(new EditStaffDto
-            {
-                Id          = form.Id,
-                FullName    = form.FullName,
-                Mobile      = form.Mobile,
-                Email       = form.Email ?? string.Empty,
-                Designation = form.Designation,
-                IsActive    = form.IsActive
-            }, ct);
+        try
+        {
+            if (form.Id == 0)
+                await staffSvc.CreateAsync(new CreateStaffDto
+                {
+                    FullName    = form.FullName,
+                    Mobile      = form.Mobile,
+                    Designation = form.Designation,
+                    JoiningDate = form.JoiningDate,
+                    LoginRole   = form.LoginRole
+                }, ct);
+            else
+                await staffSvc.UpdateAsync(new EditStaffDto
+                {
+                    Id          = form.Id,
+                    FullName    = form.FullName,
+                    Mobile      = form.Mobile,
+                    Email       = form.Email ?? string.Empty,
+                    Designation = form.Designation,
+                    IsActive    = form.IsActive
+                }, ct);
+        }
+        catch (ArgumentOutOfRangeException)
+        {
+            TempData["Error"] = "Invalid login role.";
+            return RedirectToAction(nameof(Index));
+        }
 
         TempData["Success"] = "Staff saved.";
         return RedirectToAction(nameof(Index));

@@ -79,6 +79,11 @@ public interface IGenericRepository<T> where T : class
     /// <summary>No-tracking queryable – use for read-only projections / reports.</summary>
     IQueryable<T> QueryNoTracking();
 
+    /// <summary>No-tracking queryable that bypasses tenant (and other) global query filters.
+    /// Only for legitimate cross-school aggregation (e.g. SuperAdmin system reports) — never
+    /// use this for a school-scoped read.</summary>
+    IQueryable<T> QueryIgnoreFilters();
+
     // ──────────────────────────────────────────
     // WRITE – add
     // ──────────────────────────────────────────

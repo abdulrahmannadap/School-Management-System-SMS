@@ -113,6 +113,7 @@ public class GenericRepository<T>(AppDbContext db) : IGenericRepository<T> where
 
     public IQueryable<T> Query()          => _set.AsQueryable();
     public IQueryable<T> QueryNoTracking() => _set.AsNoTracking();
+    public IQueryable<T> QueryIgnoreFilters() => _set.AsNoTracking().IgnoreQueryFilters();
 
     // ──────────────────────────────────────────
     // WRITE – add

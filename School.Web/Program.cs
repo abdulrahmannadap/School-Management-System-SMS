@@ -1,4 +1,5 @@
 using Microsoft.AspNetCore.Authentication.Cookies;
+using Microsoft.AspNetCore.Authorization;
 using School.Application.Interfaces;
 using School.Application.Services.Exam;
 using School.Application.Services.Fees;
@@ -11,6 +12,7 @@ using School.Application.Services.Staff;
 using School.Application.Services.Student;
 using School.Infrastructure.Services;
 using School.Persistence;
+using School.Web.Authorization;
 using School.Web.Services;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -31,7 +33,16 @@ builder.Services.AddScoped<IInventoryService, InventoryService>();
 builder.Services.AddScoped<IExamService, ExamService>();
 builder.Services.AddScoped<IPortalAccountService, PortalAccountService>();
 builder.Services.AddScoped<ISchoolService, SchoolService>();
+builder.Services.AddScoped<ISystemReportService, SystemReportService>();
 builder.Services.AddHttpClient<IBookAggregatorService, BookAggregatorService>();
+
+builder.Services.AddDistributedMemoryCache();
+builder.Services.AddSession(o =>
+{
+    o.IdleTimeout    = TimeSpan.FromHours(2);
+    o.Cookie.HttpOnly = true;
+    o.Cookie.Name    = "SMS.Session";
+});
 
 builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
     .AddCookie(o =>
@@ -44,7 +55,14 @@ builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationSc
         o.Cookie.Name      = "SMS.Auth";
     });
 
-builder.Services.AddAuthorization();
+builder.Services.AddScoped<IAuthorizationHandler, SchoolAccessHandler>();
+builder.Services.AddAuthorization(o =>
+{
+    o.AddPolicy("SchoolAdminAccess",
+        p => p.RequireAuthenticatedUser().AddRequirements(new SchoolAccessRequirement("SchoolAdmin")));
+    o.AddPolicy("SchoolAdminOrAccountantAccess",
+        p => p.RequireAuthenticatedUser().AddRequirements(new SchoolAccessRequirement("SchoolAdmin", "Accountant")));
+});
 
 var app = builder.Build();
 
@@ -57,6 +75,7 @@ if (!app.Environment.IsDevelopment())
 app.UseHttpsRedirection();
 app.UseRouting();
 app.MapStaticAssets();
+app.UseSession();
 app.UseAuthentication();
 app.UseAuthorization();
 

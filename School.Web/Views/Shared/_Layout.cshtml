@@ -1,9 +1,16 @@
+@inject School.Application.Interfaces.ICurrentSchoolContext CurrentSchool
+@inject School.Application.Interfaces.ISchoolService SchoolSvc
+@{
+    var effectiveSchoolName = CurrentSchool.SchoolId.HasValue
+        ? (await SchoolSvc.GetAsync(CurrentSchool.SchoolId.Value))?.Name ?? "Unknown School"
+        : "SMS Platform";
+}
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>@ViewData["Title"] – Wisdom Academy</title>
+    <title>@ViewData["Title"] – @effectiveSchoolName</title>
     <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" />
     <style>
@@ -120,10 +127,10 @@
 
     <a class="sidebar-brand" href="#">
         @* <i class="bi bi-mortarboard-fill"></i> *@
-<img src="~/images/logo_ii.jpeg" asp-append-version="true" alt="Wisdom Academy Logo" class="brand-logo" />
+<img src="~/images/logo_ii.jpeg" asp-append-version="true" alt="@(effectiveSchoolName) Logo" class="brand-logo" />
 
         <div>
-            <div class="brand-name">Wisdom Academy</div>
+            <div class="brand-name">@effectiveSchoolName</div>
             <div class="brand-sub">School Management</div>
         </div>
     </a>
@@ -170,7 +177,7 @@
                     <i class="bi bi-chevron-down chevron"></i>
                 </a>
                 <ul class="collapse sub-nav list-unstyled" id="sa-reports">
-                    <li><a class="nav-link" href="#"><i class="bi bi-file-bar-chart nav-icon"></i> System Report</a></li>
+                    <li><a class="nav-link" asp-area="SuperAdmin" asp-controller="Reports" asp-action="SystemReport"><i class="bi bi-file-bar-chart nav-icon"></i> System Report</a></li>
                     <li><a class="nav-link" href="#"><i class="bi bi-activity nav-icon"></i> Activity Log</a></li>
                 </ul>
             </li>
@@ -626,6 +633,16 @@
         </button>
         <span class="page-title">@(ViewData["Title"] ?? "Dashboard")</span>
 
+        @if (CurrentSchool.IsImpersonating)
+        {
+            <form asp-controller="Impersonation" asp-action="Stop" asp-area="" method="post" class="d-inline ms-2">
+                @Html.AntiForgeryToken()
+                <button type="submit" class="btn btn-sm btn-warning">
+                    <i class="bi bi-eye-slash me-1"></i>Exit impersonation (@effectiveSchoolName)
+                </button>
+            </form>
+        }
+
         <!-- Notifications -->
         <div class="dropdown">
             <button class="notif-btn" data-bs-toggle="dropdown" aria-expanded="false" title="Notifications">
@@ -687,7 +704,7 @@
     </div>
 
     <footer class="text-center text-muted py-3" style="font-size:.75rem; border-top:1px solid #e2e8f0; background:#fff;">
-        &copy; @DateTime.Now.Year Wisdom Academy &mdash; School Management System
+        &copy; @DateTime.Now.Year @effectiveSchoolName &mdash; School Management System
     </footer>
 
 </div>

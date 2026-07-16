@@ -7,7 +7,7 @@ using School.Web.Models.Masters;
 namespace School.Web.Areas.SchoolAdmin.Controllers;
 
 [Area("SchoolAdmin")]
-[Authorize(Roles = "SchoolAdmin")]
+[Authorize(Policy = "SchoolAdminAccess")]
 public class MastersController(IMastersService svc) : Controller
 {
     // ── Academic Year ────────────────────────────────────────

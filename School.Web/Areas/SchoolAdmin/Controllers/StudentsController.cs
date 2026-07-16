@@ -7,7 +7,7 @@ using School.Web.Models.Students;
 namespace School.Web.Areas.SchoolAdmin.Controllers;
 
 [Area("SchoolAdmin")]
-[Authorize(Roles = "SchoolAdmin")]
+[Authorize(Policy = "SchoolAdminAccess")]
 public class StudentsController(IStudentService studentSvc, IMastersService mastersSvc) : Controller
 {
     public async Task<IActionResult> Index([FromQuery] StudentSearchDto search, CancellationToken ct)

@@ -8,7 +8,7 @@ using School.Web.Models.Fees;
 namespace School.Web.Areas.SchoolAdmin.Controllers;
 
 [Area("SchoolAdmin")]
-[Authorize(Roles = "SchoolAdmin")]
+[Authorize(Policy = "SchoolAdminAccess")]
 public class FeesController(IFeesService feesSvc, IMastersService mastersSvc, IStudentService studentSvc) : Controller
 {
     public async Task<IActionResult> Index(int? classId, int? financialYearId, CancellationToken ct)

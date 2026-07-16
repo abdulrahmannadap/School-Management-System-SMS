@@ -9,7 +9,7 @@ using School.Web.Models.Library;
 namespace School.Web.Areas.SchoolAdmin.Controllers;
 
 [Area("SchoolAdmin")]
-[Authorize(Roles = "SchoolAdmin")]
+[Authorize(Policy = "SchoolAdminAccess")]
 public class LibraryController(
     ILibraryService librarySvc,
     IBookAggregatorService aggregatorSvc,

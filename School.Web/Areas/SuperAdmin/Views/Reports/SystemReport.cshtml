@@ -1,0 +1,62 @@
+@model IReadOnlyList<School.Application.DTOs.SystemReportRowDto>
+@{ ViewData["Title"] = "System Report"; }
+
+<div class="card border-0 shadow-sm">
+    <div class="card-header bg-white border-0 pt-3">
+        <h6 class="mb-0 fw-semibold"><i class="bi bi-file-bar-chart me-2 text-primary"></i>System Report</h6>
+    </div>
+    <div class="card-body">
+        @if (!Model.Any())
+        {
+            <div class="text-center text-muted py-5">
+                <i class="bi bi-building" style="font-size:2.5rem;opacity:.3"></i>
+                <p class="mt-2 mb-0">No schools yet</p>
+            </div>
+        }
+        else
+        {
+            <div class="table-responsive">
+                <table class="table align-middle">
+                    <thead>
+                        <tr>
+                            <th>Name</th>
+                            <th>Status</th>
+                            <th class="text-end">Students</th>
+                            <th class="text-end">Staff</th>
+                            <th class="text-end">Total Fee Collected</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var row in Model)
+                        {
+                            <tr>
+                                <td>@row.Name</td>
+                                <td>
+                                    @if (row.IsActive)
+                                    {
+                                        <span class="badge bg-success-subtle text-success">Active</span>
+                                    }
+                                    else
+                                    {
+                                        <span class="badge bg-secondary-subtle text-secondary">Inactive</span>
+                                    }
+                                </td>
+                                <td class="text-end">@row.StudentCount</td>
+                                <td class="text-end">@row.StaffCount</td>
+                                <td class="text-end">@row.TotalFeeCollected.ToString("C")</td>
+                            </tr>
+                        }
+                    </tbody>
+                    <tfoot>
+                        <tr class="fw-semibold">
+                            <td colspan="2">Total</td>
+                            <td class="text-end">@Model.Sum(r => r.StudentCount)</td>
+                            <td class="text-end">@Model.Sum(r => r.StaffCount)</td>
+                            <td class="text-end">@Model.Sum(r => r.TotalFeeCollected).ToString("C")</td>
+                        </tr>
+                    </tfoot>
+                </table>
+            </div>
+        }
+    </div>
+</div>

@@ -9,7 +9,7 @@ using School.Web.Models.Portal;
 namespace School.Web.Areas.SchoolAdmin.Controllers;
 
 [Area("SchoolAdmin")]
-[Authorize(Roles = "SchoolAdmin")]
+[Authorize(Policy = "SchoolAdminAccess")]
 public class PortalAccountsController(IPortalAccountService portalSvc, IStudentService studentSvc, IStaffService staffSvc) : Controller
 {
     public async Task<IActionResult> Index(StudentSearchDto search, string? staffName, string? staffCode, CancellationToken ct)

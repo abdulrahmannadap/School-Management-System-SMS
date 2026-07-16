@@ -7,7 +7,7 @@ using School.Web.Models.Inventory;
 namespace School.Web.Areas.SchoolAdmin.Controllers;
 
 [Area("SchoolAdmin")]
-[Authorize(Roles = "SchoolAdmin,Accountant")]
+[Authorize(Policy = "SchoolAdminOrAccountantAccess")]
 public class InventoryController(IInventoryService inventorySvc) : Controller
 {
     public async Task<IActionResult> Products(int? categoryId, CancellationToken ct)

@@ -7,7 +7,7 @@ using School.Web.Models.Exams;
 namespace School.Web.Areas.SchoolAdmin.Controllers;
 
 [Area("SchoolAdmin")]
-[Authorize(Roles = "SchoolAdmin")]
+[Authorize(Policy = "SchoolAdminAccess")]
 public class ExamController(IExamService examSvc, IMastersService mastersSvc, IStudentService studentSvc) : Controller
 {
     public async Task<IActionResult> Index(int? financialYearId, CancellationToken ct)

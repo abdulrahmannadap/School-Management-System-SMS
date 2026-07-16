@@ -7,7 +7,7 @@ using School.Web.Models.Staff;
 namespace School.Web.Areas.SchoolAdmin.Controllers;
 
 [Area("SchoolAdmin")]
-[Authorize(Roles = "SchoolAdmin")]
+[Authorize(Policy = "SchoolAdminAccess")]
 public class StaffController(IStaffService staffSvc) : Controller
 {
     public async Task<IActionResult> Index([FromQuery] StaffSearchDto search, CancellationToken ct)

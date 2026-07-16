@@ -78,6 +78,13 @@
                                             onclick="openAdminModal(this.dataset.id)">
                                         <i class="bi bi-person-plus"></i> Create Admin
                                     </button>
+                                    <form asp-controller="Impersonation" asp-action="Start" asp-area="" method="post" class="d-inline">
+                                        @Html.AntiForgeryToken()
+                                        <input type="hidden" name="schoolId" value="@s.Id" />
+                                        <button type="submit" class="btn btn-sm btn-outline-secondary">
+                                            <i class="bi bi-eye"></i> View As
+                                        </button>
+                                    </form>
                                 </td>
                             </tr>
                         }

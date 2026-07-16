@@ -107,6 +107,8 @@ public class AppDbContext(DbContextOptions<AppDbContext> options, ICurrentSchool
     public DbSet<BookReturn>         BookReturns        => Set<BookReturn>();
     public DbSet<BookLedger>         BookLedgers        => Set<BookLedger>();
 
+    public DbSet<MenuItem>           MenuItems          => Set<MenuItem>();
+
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         // Apply decimal(18,2) globally to all decimal properties
@@ -136,6 +138,15 @@ public class AppDbContext(DbContextOptions<AppDbContext> options, ICurrentSchool
 
         modelBuilder.Entity<LibraryBook>(e =>
             e.HasIndex(b => new { b.SchoolId, b.ISBN }).IsUnique());
+
+        modelBuilder.Entity<MenuItem>(e =>
+        {
+            e.HasIndex(m => new { m.SchoolId, m.Role });
+            e.HasOne<MenuItem>()
+                .WithMany()
+                .HasForeignKey(m => m.ParentId)
+                .OnDelete(DeleteBehavior.Restrict);
+        });
 
         // ── Multi-tenancy: apply a global query filter to every ITenantEntity ──
         var setQueryFilterMethod = typeof(AppDbContext)

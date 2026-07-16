@@ -1,0 +1,36 @@
+@model School.Application.DTOs.Menu.MenuItemDto
+@{
+    var vm = (School.Web.Models.SuperAdmin.MenusIndexViewModel)ViewData["ParentViewModel"]!;
+}
+<form asp-action="MoveUp" asp-route-schoolId="@vm.SelectedSchoolId" asp-route-role="@vm.SelectedRole" method="post" class="d-inline">
+    @Html.AntiForgeryToken()
+    <input type="hidden" name="id" value="@Model.Id" />
+    <button type="submit" class="btn btn-sm btn-outline-secondary" title="Move up"><i class="bi bi-arrow-up"></i></button>
+</form>
+<form asp-action="MoveDown" asp-route-schoolId="@vm.SelectedSchoolId" asp-route-role="@vm.SelectedRole" method="post" class="d-inline">
+    @Html.AntiForgeryToken()
+    <input type="hidden" name="id" value="@Model.Id" />
+    <button type="submit" class="btn btn-sm btn-outline-secondary" title="Move down"><i class="bi bi-arrow-down"></i></button>
+</form>
+<form asp-action="ToggleEnabled" asp-route-schoolId="@vm.SelectedSchoolId" asp-route-role="@vm.SelectedRole" method="post" class="d-inline">
+    @Html.AntiForgeryToken()
+    <input type="hidden" name="id" value="@Model.Id" />
+    <input type="hidden" name="enabled" value="@(!Model.IsEnabled)" />
+    <button type="submit" class="btn btn-sm btn-outline-@(Model.IsEnabled ? "warning" : "success")" title="@(Model.IsEnabled ? "Disable" : "Enable")">
+        <i class="bi bi-@(Model.IsEnabled ? "eye-slash" : "eye")"></i>
+    </button>
+</form>
+<button type="button" class="btn btn-sm btn-outline-primary"
+        data-id="@Model.Id" data-label="@Model.Label" data-icon="@Model.IconCssClass"
+        data-parentid="@Model.ParentId" data-section="@Model.SectionLabel"
+        data-area="@Model.Area" data-controller="@Model.Controller" data-action="@Model.Action"
+        data-enabled="@Model.IsEnabled.ToString().ToLower()"
+        onclick="openEditModal(this.dataset)" title="Edit">
+    <i class="bi bi-pencil"></i>
+</button>
+<form asp-action="Delete" asp-route-schoolId="@vm.SelectedSchoolId" asp-route-role="@vm.SelectedRole" method="post" class="d-inline"
+      onsubmit="return confirm('Delete this menu item and its children?');">
+    @Html.AntiForgeryToken()
+    <input type="hidden" name="id" value="@Model.Id" />
+    <button type="submit" class="btn btn-sm btn-outline-danger" title="Delete"><i class="bi bi-trash"></i></button>
+</form>

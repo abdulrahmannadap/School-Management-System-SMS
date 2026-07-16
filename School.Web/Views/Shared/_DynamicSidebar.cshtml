@@ -1,0 +1,67 @@
+@using System.Security.Claims
+@using School.Application.DTOs.Menu
+@using School.Domain.Enums
+@inject School.Application.Interfaces.IMenuService MenuSvc
+@inject School.Application.Interfaces.ICurrentSchoolContext CurrentSchool
+@{
+    var roleClaim = User.FindFirst(ClaimTypes.Role)?.Value;
+    var hasRole = Enum.TryParse<UserRole>(roleClaim, out var role);
+
+    // An impersonating SuperAdmin's role claim never changes -- the sidebar
+    // must still render the impersonated school's SchoolAdmin menu, not SuperAdmin's.
+    if (CurrentSchool.IsImpersonating)
+    {
+        hasRole = true;
+        role = UserRole.SchoolAdmin;
+    }
+
+    IReadOnlyList<MenuItemDto> tree = hasRole
+        ? await MenuSvc.GetMenuTreeAsync(role == UserRole.SuperAdmin ? null : CurrentSchool.SchoolId, role)
+        : [];
+
+    string? lastSection = null;
+
+    string BuildUrl(MenuItemDto item) =>
+        string.IsNullOrEmpty(item.Controller) || string.IsNullOrEmpty(item.Action)
+            ? "#"
+            : Url.Action(item.Action, item.Controller, string.IsNullOrEmpty(item.Area) ? null : new { area = item.Area }) ?? "#";
+}
+@foreach (var item in tree)
+{
+    if (item.SectionLabel != lastSection)
+    {
+        lastSection = item.SectionLabel;
+        if (!string.IsNullOrEmpty(lastSection))
+        {
+            <li><span class="nav-section">@lastSection</span></li>
+        }
+    }
+
+    if (item.Children.Count > 0)
+    {
+        var collapseId = "menu-" + item.Id;
+        <li>
+            <a class="nav-link" data-bs-toggle="collapse" href="#@collapseId" role="button" aria-expanded="false">
+                <i class="bi @item.IconCssClass nav-icon"></i> <span class="nav-label">@item.Label</span> <i class="bi bi-chevron-down chevron"></i>
+            </a>
+            <ul class="collapse sub-nav list-unstyled" id="@collapseId">
+                @foreach (var child in item.Children)
+                {
+                    <li>
+                        <a class="nav-link" href="@BuildUrl(child)">
+                            <i class="bi @child.IconCssClass nav-icon"></i> <span class="nav-label">@child.Label</span>
+                        </a>
+                    </li>
+                }
+            </ul>
+        </li>
+    }
+    else
+    {
+        <li>
+            <a class="nav-link" href="@BuildUrl(item)">
+                <i class="bi @item.IconCssClass nav-icon"></i> <span class="nav-label">@item.Label</span>
+            </a>
+        </li>
+    }
+}

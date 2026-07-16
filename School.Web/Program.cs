@@ -33,6 +33,8 @@ builder.Services.AddScoped<IInventoryService, InventoryService>();
 builder.Services.AddScoped<IExamService, ExamService>();
 builder.Services.AddScoped<IPortalAccountService, PortalAccountService>();
 builder.Services.AddScoped<ISchoolService, SchoolService>();
+builder.Services.AddScoped<School.Application.Services.MenuService>();
+builder.Services.AddScoped<IMenuService, School.Web.Services.CachedMenuService>();
 builder.Services.AddScoped<ISystemReportService, SystemReportService>();
 builder.Services.AddHttpClient<IBookAggregatorService, BookAggregatorService>();
 
@@ -82,5 +84,11 @@ app.UseAuthorization();
 
 app.MapControllerRoute(name: "areas",   pattern: "{area:exists}/{controller=Home}/{action=Index}/{id?}");
 app.MapControllerRoute(name: "default", pattern: "{controller=Account}/{action=Login}/{id?}");
+
+using (var scope = app.Services.CreateScope())
+{
+    var db = scope.ServiceProvider.GetRequiredService<School.Persistence.AppDbContext>();
+    await School.Persistence.MenuSeedData.SeedDefaultsAsync(db);
+}
 
 app.Run();

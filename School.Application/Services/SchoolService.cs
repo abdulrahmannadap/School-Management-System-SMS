@@ -8,7 +8,8 @@ namespace School.Application.Services;
 
 public class SchoolService(
     IGenericRepository<Domain.Entities.School> schoolRepo,
-    IGenericRepository<User>                   userRepo) : ISchoolService
+    IGenericRepository<User>                   userRepo,
+    IMenuService                                menuSvc) : ISchoolService
 {
     public async Task<SchoolDto> CreateAsync(SchoolDto dto, CancellationToken ct = default)
     {
@@ -22,6 +23,9 @@ public class SchoolService(
         };
         await schoolRepo.AddAsync(entity, ct);
         await schoolRepo.SaveChangesAsync(ct);
+
+        await menuSvc.CloneDefaultsForSchoolAsync(entity.Id, ct);
+
         return Map(entity);
     }
 

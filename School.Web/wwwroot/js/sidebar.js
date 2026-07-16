@@ -6,6 +6,7 @@
 
     var STORAGE_COLLAPSED = 'sms.sidebar.collapsed';
     var STORAGE_OPEN_SUBMENU = 'sms.sidebar.openSubmenu';
+    var STORAGE_SCROLL = 'sms.sidebar.scrollTop';
     var MOBILE_BREAKPOINT = 991;
 
     var sidebar = document.getElementById('sidebar');
@@ -193,6 +194,23 @@
         });
     }
 
+    // ── Scroll position persistence ─────────────────────────────────────
+    function initScrollPersistence() {
+        var restore = parseInt(localStorage.getItem(STORAGE_SCROLL), 10);
+        if (!isNaN(restore)) sidebarNav.scrollTop = restore;
+
+        var saveTimer = null;
+        sidebarNav.addEventListener('scroll', function () {
+            clearTimeout(saveTimer);
+            saveTimer = setTimeout(function () {
+                localStorage.setItem(STORAGE_SCROLL, String(sidebarNav.scrollTop));
+            }, 150);
+        });
+        window.addEventListener('beforeunload', function () {
+            localStorage.setItem(STORAGE_SCROLL, String(sidebarNav.scrollTop));
+        });
+    }
+
     // ── Init ─────────────────────────────────────────────────────────────
     restoreCollapsedState();
     initDesktopCollapse();
@@ -201,4 +219,5 @@
     markActiveAndExpand();
     initTooltips();
     initKeyboardNav();
+    initScrollPersistence();
 })();

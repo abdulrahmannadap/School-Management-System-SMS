@@ -418,3 +418,86 @@ body.sidebar-collapsed .main-wrapper { margin-left: var(--sidebar-collapsed-w); 
         gap: .8rem;
     }
 }
+
+/* ── Light/dark theme ─────────────────────────────────────────────────────
+   The sidebar rail is always the same dark slate regardless of theme (a
+   deliberate, common enterprise pattern — a fixed-dark nav rail alongside a
+   light/dark-toggleable content area). These overrides only affect the
+   topbar/content/footer/dropdowns, driven by Bootstrap 5.3's native
+   [data-bs-theme] attribute on <html>. */
+
+[data-bs-theme="dark"] body { background: #0f172a; }
+
+[data-bs-theme="dark"] .topbar {
+    background: #1e293b;
+    box-shadow: 0 1px 4px rgba(0, 0, 0, .4);
+}
+[data-bs-theme="dark"] .topbar .page-title { color: #e2e8f0; }
+
+[data-bs-theme="dark"] .notif-btn,
+[data-bs-theme="dark"] .user-btn,
+[data-bs-theme="dark"] .theme-toggle-btn { color: #94a3b8; }
+[data-bs-theme="dark"] .notif-btn:hover,
+[data-bs-theme="dark"] .user-btn:hover,
+[data-bs-theme="dark"] .theme-toggle-btn:hover { background: #334155; }
+
+[data-bs-theme="dark"] .user-info { color: #e2e8f0; }
+
+[data-bs-theme="dark"] .notif-header { color: #e2e8f0; border-bottom-color: #334155; }
+[data-bs-theme="dark"] .notif-item { color: #cbd5e1; border-bottom-color: #334155; }
+
+[data-bs-theme="dark"] .app-footer {
+    background: #1e293b;
+    border-top-color: #334155;
+    color: #94a3b8;
+}
+
+[data-bs-theme="dark"] .sidebar-toggle-btn {
+    background: #1e293b;
+    border-color: #334155;
+    color: #cbd5e1;
+}
+[data-bs-theme="dark"] .sidebar-toggle-btn:hover { background: #334155; }
+
+/* ── Theme toggle button ──────────────────────────────────────────────── */
+
+.theme-toggle-btn {
+    background: none;
+    border: none;
+    color: #64748b;
+    font-size: 1.1rem;
+    padding: .3rem .5rem;
+    border-radius: .4rem;
+    transition: background var(--transition-fast);
+}
+.theme-toggle-btn:hover { background: #f1f5f9; }
+
+.theme-toggle-btn .theme-icon-dark { display: none; }
+[data-bs-theme="dark"] .theme-toggle-btn .theme-icon-light { display: none; }
+[data-bs-theme="dark"] .theme-toggle-btn .theme-icon-dark { display: inline; }
+
+/* ── Page loader overlay ──────────────────────────────────────────────── */
+
+.page-loader {
+    position: fixed;
+    inset: 0;
+    z-index: 1080;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: rgba(241, 245, 249, .7);
+    opacity: 0;
+    visibility: hidden;
+    pointer-events: none;
+    transition: opacity var(--transition-base);
+}
+.page-loader.show { opacity: 1; visibility: visible; pointer-events: auto; }
+[data-bs-theme="dark"] .page-loader { background: rgba(15, 23, 42, .7); }
+
+/* ── Breadcrumb ───────────────────────────────────────────────────────── */
+
+.breadcrumb-bar {
+    padding: .6rem 1.5rem 0;
+    background: transparent;
+}
+.breadcrumb-bar .breadcrumb { margin-bottom: 0; font-size: .82rem; }

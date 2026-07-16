@@ -1,0 +1,48 @@
+        <li><span class="nav-section">Main</span></li>
+        <li>
+            <a class="nav-link" asp-area="SuperAdmin" asp-controller="Home" asp-action="Index">
+                <i class="bi bi-speedometer2 nav-icon"></i> <span class="nav-label">Dashboard</span> </a>
+        </li>
+
+        <li><span class="nav-section">Management</span></li>
+
+        <li>
+            <a class="nav-link" data-bs-toggle="collapse" href="#sa-schools" role="button" aria-expanded="false">
+                <i class="bi bi-building nav-icon"></i> <span class="nav-label">Schools</span> <i class="bi bi-chevron-down chevron"></i>
+            </a>
+            <ul class="collapse sub-nav list-unstyled" id="sa-schools">
+                <li><a class="nav-link" asp-area="SuperAdmin" asp-controller="Schools" asp-action="Index"><i class="bi bi-list-ul nav-icon"></i> <span class="nav-label">All Schools</span> </a></li>
+            </ul>
+        </li>
+
+        <li>
+            <a class="nav-link" data-bs-toggle="collapse" href="#sa-users" role="button" aria-expanded="false">
+                <i class="bi bi-people nav-icon"></i> <span class="nav-label">Users</span> <i class="bi bi-chevron-down chevron"></i>
+            </a>
+            <ul class="collapse sub-nav list-unstyled" id="sa-users">
+                <li><a class="nav-link" href="#"><i class="bi bi-list-ul nav-icon"></i> <span class="nav-label">All Users</span> </a></li>
+                <li><a class="nav-link" href="#"><i class="bi bi-person-plus nav-icon"></i> <span class="nav-label">Add User</span> </a></li>
+                <li><a class="nav-link" href="#"><i class="bi bi-shield-check nav-icon"></i> <span class="nav-label">Roles</span> </a></li>
+            </ul>
+        </li>
+
+        <li>
+            <a class="nav-link" data-bs-toggle="collapse" href="#sa-reports" role="button" aria-expanded="false">
+                <i class="bi bi-bar-chart-line nav-icon"></i> <span class="nav-label">Reports</span> <i class="bi bi-chevron-down chevron"></i>
+            </a>
+            <ul class="collapse sub-nav list-unstyled" id="sa-reports">
+                <li><a class="nav-link" asp-area="SuperAdmin" asp-controller="Reports" asp-action="SystemReport"><i class="bi bi-file-bar-chart nav-icon"></i> <span class="nav-label">System Report</span> </a></li>
+                <li><a class="nav-link" href="#"><i class="bi bi-activity nav-icon"></i> <span class="nav-label">Activity Log</span> </a></li>
+            </ul>
+        </li>
+
+        <li>
+            <a class="nav-link" data-bs-toggle="collapse" href="#sa-settings" role="button" aria-expanded="false">
+                <i class="bi bi-gear nav-icon"></i> <span class="nav-label">Settings</span> <i class="bi bi-chevron-down chevron"></i>
+            </a>
+            <ul class="collapse sub-nav list-unstyled" id="sa-settings">
+                <li><a class="nav-link" href="#"><i class="bi bi-sliders nav-icon"></i> <span class="nav-label">General</span> </a></li>
+                <li><a class="nav-link" href="#"><i class="bi bi-envelope-gear nav-icon"></i> <span class="nav-label">Email Config</span> </a></li>
+                <li><a class="nav-link" href="#"><i class="bi bi-database-gear nav-icon"></i> <span class="nav-label">Backup</span> </a></li>
+            </ul>
+        </li>

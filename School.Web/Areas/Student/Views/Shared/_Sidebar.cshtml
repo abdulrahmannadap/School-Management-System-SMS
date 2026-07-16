@@ -1,0 +1,47 @@
+        <li><span class="nav-section">Main</span></li>
+        <li>
+            <a class="nav-link" asp-area="Student" asp-controller="Home" asp-action="Index">
+                <i class="bi bi-speedometer2 nav-icon"></i> <span class="nav-label">Dashboard</span> </a>
+        </li>
+
+        <li><span class="nav-section">My Portal</span></li>
+
+        <li>
+            <a class="nav-link" data-bs-toggle="collapse" href="#stu-attendance" role="button" aria-expanded="false">
+                <i class="bi bi-calendar-check nav-icon"></i> <span class="nav-label">Attendance</span> <i class="bi bi-chevron-down chevron"></i>
+            </a>
+            <ul class="collapse sub-nav list-unstyled" id="stu-attendance">
+                <li><a class="nav-link" asp-area="Student" asp-controller="Attendance" asp-action="Index"><i class="bi bi-eye nav-icon"></i> <span class="nav-label">View Attendance</span> </a></li>
+            </ul>
+        </li>
+
+        <li>
+            <a class="nav-link" data-bs-toggle="collapse" href="#stu-exams" role="button" aria-expanded="false">
+                <i class="bi bi-award nav-icon"></i> <span class="nav-label">Exams</span> <i class="bi bi-chevron-down chevron"></i>
+            </a>
+            <ul class="collapse sub-nav list-unstyled" id="stu-exams">
+                <li><a class="nav-link" asp-area="Student" asp-controller="Results" asp-action="Index"><i class="bi bi-list-check nav-icon"></i> <span class="nav-label">My Results</span> </a></li>
+                <li><a class="nav-link" href="#"><i class="bi bi-patch-question nav-icon"></i> <span class="nav-label">MCQ Tests</span> </a></li>
+            </ul>
+        </li>
+
+        <li>
+            <a class="nav-link" data-bs-toggle="collapse" href="#stu-library" role="button" aria-expanded="false">
+                <i class="bi bi-book nav-icon"></i> <span class="nav-label">Library</span> <i class="bi bi-chevron-down chevron"></i>
+            </a>
+            <ul class="collapse sub-nav list-unstyled" id="stu-library">
+                <li><a class="nav-link" asp-area="Student" asp-controller="Library" asp-action="Index"><i class="bi bi-arrow-left-right nav-icon"></i> <span class="nav-label">Issued Books</span> </a></li>
+            </ul>
+        </li>
+
+        <li>
+            <a class="nav-link" data-bs-toggle="collapse" href="#stu-fees" role="button" aria-expanded="false">
+                <i class="bi bi-cash-stack nav-icon"></i> <span class="nav-label">Fees</span> <i class="bi bi-chevron-down chevron"></i>
+            </a>
+            <ul class="collapse sub-nav list-unstyled" id="stu-fees">
+                <li><a class="nav-link" asp-area="Student" asp-controller="Fees" asp-action="Index"><i class="bi bi-clock-history nav-icon"></i> <span class="nav-label">Pending Fees</span> </a></li>
+                <li><a class="nav-link" asp-area="Student" asp-controller="Fees" asp-action="Index"><i class="bi bi-receipt nav-icon"></i> <span class="nav-label">Payment History</span> </a></li>
+            </ul>
+        </li>
+
+        <li><a class="nav-link" href="#"><i class="bi bi-person-circle nav-icon"></i> <span class="nav-label">My Profile</span> </a></li>

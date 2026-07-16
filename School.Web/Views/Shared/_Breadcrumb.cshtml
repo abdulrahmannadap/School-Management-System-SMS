@@ -1,0 +1,21 @@
+@* Opt-in breadcrumb trail. A controller/view sets:
+   ViewData["Breadcrumb"] = new List<(string Text, string? Url)> { ("Students", "/SchoolAdmin/Students"), ("Edit", null) };
+   Renders nothing if unset — every existing page is unaffected. *@
+@if (ViewData["Breadcrumb"] is IEnumerable<(string Text, string? Url)> crumbs && crumbs.Any())
+{
+    <nav class="breadcrumb-bar" aria-label="breadcrumb">
+        <ol class="breadcrumb">
+            @foreach (var crumb in crumbs)
+            {
+                if (crumb.Url is not null)
+                {
+                    <li class="breadcrumb-item"><a href="@crumb.Url">@crumb.Text</a></li>
+                }
+                else
+                {
+                    <li class="breadcrumb-item active" aria-current="page">@crumb.Text</li>
+                }
+            }
+        </ol>
+    </nav>
+}

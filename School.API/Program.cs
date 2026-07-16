@@ -12,14 +12,17 @@ using School.Application.Services.Staff;
 using School.Application.Services.Student;
 using School.Infrastructure.Services;
 using School.Persistence;
+using School.API.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddControllers();
 builder.Services.AddOpenApi();
+builder.Services.AddHttpContextAccessor();
 
 builder.Services.AddPersistence(builder.Configuration);
 
+builder.Services.AddScoped<ICurrentSchoolContext, CurrentSchoolContext>();
 builder.Services.AddScoped<IJwtService, JwtService>();
 builder.Services.AddScoped<IMastersService, MastersService>();
 builder.Services.AddScoped<IStudentService, StudentService>();

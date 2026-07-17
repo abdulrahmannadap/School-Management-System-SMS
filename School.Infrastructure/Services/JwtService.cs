@@ -17,7 +17,7 @@ public class JwtService : IJwtService
         _configuration = configuration;
     }
 
-    public string GenerateToken(User user)
+    public string GenerateToken(User user, IReadOnlyList<string>? permissionKeys = null)
     {
         var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration["Jwt:SecretKey"]!));
         var credentials = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
@@ -32,6 +32,9 @@ public class JwtService : IJwtService
 
         if (user.SchoolId.HasValue)
             claims.Add(new Claim("SchoolId", user.SchoolId.Value.ToString()));
+
+        if (permissionKeys is not null)
+            claims.AddRange(permissionKeys.Select(k => new Claim("perm", k)));
 
         var expiryHours = double.Parse(_configuration["Jwt:ExpiryHours"]!);
 

@@ -5,16 +5,16 @@ using School.Domain.Entities.Inventory;
 namespace School.Application.Services.Inventory;
 
 public class InventoryService(
-    IGenericRepository<Category>        categoryRepo,
-    IGenericRepository<Product>         productRepo,
-    IGenericRepository<ProductVariant>  variantRepo,
-    IGenericRepository<Packaging>       packagingRepo,
-    IGenericRepository<StockLedger>     stockRepo,
-    IGenericRepository<Invoice>         invoiceRepo,
-    IGenericRepository<InvoiceItem>     invoiceItemRepo,
-    IGenericRepository<CreditPayment>   creditRepo,
-    IGenericRepository<InventoryOrder>  orderRepo,
-    IGenericRepository<Expense>         expenseRepo) : IInventoryService
+    IGenericRepository<Category> categoryRepo,
+    IGenericRepository<Product> productRepo,
+    IGenericRepository<ProductVariant> variantRepo,
+    IGenericRepository<Packaging> packagingRepo,
+    IGenericRepository<StockLedger> stockRepo,
+    IGenericRepository<Invoice> invoiceRepo,
+    IGenericRepository<InvoiceItem> invoiceItemRepo,
+    IGenericRepository<CreditPayment> creditRepo,
+    IGenericRepository<InventoryOrder> orderRepo,
+    IGenericRepository<Expense> expenseRepo) : IInventoryService
 {
     // ── Category ─────────────────────────────────────────────
 
@@ -58,11 +58,11 @@ public class InventoryService(
     {
         var entity = new Product
         {
-            Name          = dto.Name,
-            CategoryId    = dto.CategoryId,
+            Name = dto.Name,
+            CategoryId = dto.CategoryId,
             PurchasePrice = dto.PurchasePrice,
-            SellingPrice  = dto.SellingPrice,
-            IsActive      = dto.IsActive
+            SellingPrice = dto.SellingPrice,
+            IsActive = dto.IsActive
         };
         await productRepo.AddAsync(entity, ct);
         await productRepo.SaveChangesAsync(ct);
@@ -74,11 +74,11 @@ public class InventoryService(
         var entity = await productRepo.FirstOrDefaultAsync(p => p.Id == dto.Id, ct)
             ?? throw new KeyNotFoundException($"Product {dto.Id} not found.");
 
-        entity.Name          = dto.Name;
-        entity.CategoryId    = dto.CategoryId;
+        entity.Name = dto.Name;
+        entity.CategoryId = dto.CategoryId;
         entity.PurchasePrice = dto.PurchasePrice;
-        entity.SellingPrice  = dto.SellingPrice;
-        entity.IsActive      = dto.IsActive;
+        entity.SellingPrice = dto.SellingPrice;
+        entity.IsActive = dto.IsActive;
 
         productRepo.Update(entity);
         await productRepo.SaveChangesAsync(ct);
@@ -114,9 +114,9 @@ public class InventoryService(
     {
         var entity = new ProductVariant
         {
-            ProductId   = dto.ProductId,
+            ProductId = dto.ProductId,
             VariantType = dto.VariantType,
-            Value       = dto.Value
+            Value = dto.Value
         };
         await variantRepo.AddAsync(entity, ct);
         await variantRepo.SaveChangesAsync(ct);
@@ -128,7 +128,7 @@ public class InventoryService(
         var entity = await variantRepo.FirstOrDefaultAsync(v => v.Id == dto.Id, ct)
             ?? throw new KeyNotFoundException($"Variant {dto.Id} not found.");
         entity.VariantType = dto.VariantType;
-        entity.Value       = dto.Value;
+        entity.Value = dto.Value;
         variantRepo.Update(entity);
         await variantRepo.SaveChangesAsync(ct);
         return MapVariant(entity);
@@ -191,11 +191,11 @@ public class InventoryService(
     {
         await stockRepo.AddAsync(new StockLedger
         {
-            ProductId   = dto.ProductId,
-            InQty       = dto.InQty,
-            OutQty      = dto.OutQty,
-            Date        = dto.Date,
-            Type        = dto.Type,
+            ProductId = dto.ProductId,
+            InQty = dto.InQty,
+            OutQty = dto.OutQty,
+            Date = dto.Date,
+            Type = dto.Type,
             ReferenceNo = dto.ReferenceNo
         }, ct);
         await stockRepo.SaveChangesAsync(ct);
@@ -207,12 +207,12 @@ public class InventoryService(
         return list.OrderByDescending(s => s.Date)
                    .Select(s => new StockLedgerDto
                    {
-                       Id          = s.Id,
-                       ProductId   = s.ProductId,
-                       InQty       = s.InQty,
-                       OutQty      = s.OutQty,
-                       Date        = s.Date,
-                       Type        = s.Type,
+                       Id = s.Id,
+                       ProductId = s.ProductId,
+                       InQty = s.InQty,
+                       OutQty = s.OutQty,
+                       Date = s.Date,
+                       Type = s.Type,
                        ReferenceNo = s.ReferenceNo
                    }).ToList();
     }
@@ -220,17 +220,17 @@ public class InventoryService(
     public async Task<StockBalanceDto> GetStockBalanceAsync(int productId, CancellationToken ct = default)
     {
         var product = await productRepo.FirstOrDefaultAsync(p => p.Id == productId, ct);
-        var ledger  = await stockRepo.FindAsync(s => s.ProductId == productId, ct);
+        var ledger = await stockRepo.FindAsync(s => s.ProductId == productId, ct);
 
-        var totalIn  = ledger.Sum(s => s.InQty);
+        var totalIn = ledger.Sum(s => s.InQty);
         var totalOut = ledger.Sum(s => s.OutQty);
 
         return new StockBalanceDto
         {
-            ProductId    = productId,
-            ProductName  = product?.Name ?? string.Empty,
-            TotalIn      = totalIn,
-            TotalOut     = totalOut,
+            ProductId = productId,
+            ProductName = product?.Name ?? string.Empty,
+            TotalIn = totalIn,
+            TotalOut = totalOut,
             CurrentStock = totalIn - totalOut
         };
     }
@@ -238,19 +238,19 @@ public class InventoryService(
     public async Task<IReadOnlyList<StockBalanceDto>> GetAllStockBalancesAsync(CancellationToken ct = default)
     {
         var products = await productRepo.FindAsync(p => p.IsActive, ct);
-        var ledger   = await stockRepo.GetAllAsync(ct);
+        var ledger = await stockRepo.GetAllAsync(ct);
 
         return products.Select(p =>
         {
-            var pLedger  = ledger.Where(l => l.ProductId == p.Id).ToList();
-            var totalIn  = pLedger.Sum(l => l.InQty);
+            var pLedger = ledger.Where(l => l.ProductId == p.Id).ToList();
+            var totalIn = pLedger.Sum(l => l.InQty);
             var totalOut = pLedger.Sum(l => l.OutQty);
             return new StockBalanceDto
             {
-                ProductId    = p.Id,
-                ProductName  = p.Name,
-                TotalIn      = totalIn,
-                TotalOut     = totalOut,
+                ProductId = p.Id,
+                ProductName = p.Name,
+                TotalIn = totalIn,
+                TotalOut = totalOut,
                 CurrentStock = totalIn - totalOut
             };
         }).OrderBy(s => s.ProductName).ToList();
@@ -264,13 +264,13 @@ public class InventoryService(
 
         var invoice = new Invoice
         {
-            InvoiceNo     = invoiceNo,
-            Date          = dto.Date,
-            CustomerName  = dto.CustomerName,
-            TotalAmount   = dto.Items.Sum(i => i.Quantity * i.Rate),
-            PaidAmount    = dto.PaidAmount,
+            InvoiceNo = invoiceNo,
+            Date = dto.Date,
+            CustomerName = dto.CustomerName,
+            TotalAmount = dto.Items.Sum(i => i.Quantity * i.Rate),
+            PaidAmount = dto.PaidAmount,
             PendingAmount = dto.Items.Sum(i => i.Quantity * i.Rate) - dto.PaidAmount,
-            Status        = dto.PaidAmount >= dto.Items.Sum(i => i.Quantity * i.Rate) ? "Paid" : dto.PaidAmount > 0 ? "Partial" : "Pending"
+            Status = dto.PaidAmount >= dto.Items.Sum(i => i.Quantity * i.Rate) ? "Paid" : dto.PaidAmount > 0 ? "Partial" : "Pending"
         };
         await invoiceRepo.AddAsync(invoice, ct);
         await invoiceRepo.SaveChangesAsync(ct);
@@ -282,19 +282,19 @@ public class InventoryService(
             {
                 InvoiceId = invoice.Id,
                 ProductId = item.ProductId,
-                Quantity  = item.Quantity,
-                Rate      = item.Rate,
-                Amount    = lineAmount
+                Quantity = item.Quantity,
+                Rate = item.Rate,
+                Amount = lineAmount
             }, ct);
 
             // stock out entry
             await stockRepo.AddAsync(new StockLedger
             {
-                ProductId   = item.ProductId,
-                InQty       = 0,
-                OutQty      = item.Quantity,
-                Date        = dto.Date,
-                Type        = "Sale",
+                ProductId = item.ProductId,
+                InQty = 0,
+                OutQty = item.Quantity,
+                Date = dto.Date,
+                Type = "Sale",
                 ReferenceNo = invoiceNo
             }, ct);
         }
@@ -315,7 +315,7 @@ public class InventoryService(
     public async Task<IReadOnlyList<InvoiceDto>> GetInvoicesAsync(DateTime from, DateTime to, CancellationToken ct = default)
     {
         var invoices = await invoiceRepo.FindAsync(i => i.Date.Date >= from.Date && i.Date.Date <= to.Date, ct);
-        var result   = new List<InvoiceDto>();
+        var result = new List<InvoiceDto>();
 
         foreach (var inv in invoices.OrderByDescending(i => i.Date))
         {
@@ -341,8 +341,8 @@ public class InventoryService(
     {
         await creditRepo.AddAsync(new CreditPayment
         {
-            InvoiceId   = dto.InvoiceId,
-            Amount      = dto.Amount,
+            InvoiceId = dto.InvoiceId,
+            Amount = dto.Amount,
             PaymentDate = dto.PaymentDate,
             PaymentMode = dto.PaymentMode
         }, ct);
@@ -351,9 +351,9 @@ public class InventoryService(
         var invoice = await invoiceRepo.FirstOrDefaultAsync(i => i.Id == dto.InvoiceId, ct);
         if (invoice is not null)
         {
-            invoice.PaidAmount    += dto.Amount;
-            invoice.PendingAmount  = Math.Max(0, invoice.TotalAmount - invoice.PaidAmount);
-            invoice.Status         = invoice.PendingAmount == 0 ? "Paid" : "Partial";
+            invoice.PaidAmount += dto.Amount;
+            invoice.PendingAmount = Math.Max(0, invoice.TotalAmount - invoice.PaidAmount);
+            invoice.Status = invoice.PendingAmount == 0 ? "Paid" : "Partial";
             invoiceRepo.Update(invoice);
         }
 
@@ -366,9 +366,9 @@ public class InventoryService(
         return list.OrderByDescending(c => c.PaymentDate)
                    .Select(c => new CreditPaymentDto
                    {
-                       Id          = c.Id,
-                       InvoiceId   = c.InvoiceId,
-                       Amount      = c.Amount,
+                       Id = c.Id,
+                       InvoiceId = c.InvoiceId,
+                       Amount = c.Amount,
                        PaymentDate = c.PaymentDate,
                        PaymentMode = c.PaymentMode
                    }).ToList();
@@ -379,12 +379,12 @@ public class InventoryService(
     public async Task<InventoryOrderDto> CreateOrderAsync(InventoryOrderDto dto, CancellationToken ct = default)
     {
         var orderNo = await GenerateOrderNoAsync(ct);
-        var entity  = new InventoryOrder
+        var entity = new InventoryOrder
         {
-            OrderNo      = orderNo,
-            Date         = dto.Date,
+            OrderNo = orderNo,
+            Date = dto.Date,
             CustomerName = dto.CustomerName,
-            Status       = "Pending"
+            Status = "Pending"
         };
         await orderRepo.AddAsync(entity, ct);
         await orderRepo.SaveChangesAsync(ct);
@@ -419,9 +419,9 @@ public class InventoryService(
         var entity = new Expense
         {
             ExpenseName = dto.ExpenseName,
-            Amount      = dto.Amount,
-            Date        = dto.Date,
-            Category    = dto.Category
+            Amount = dto.Amount,
+            Date = dto.Date,
+            Category = dto.Category
         };
         await expenseRepo.AddAsync(entity, ct);
         await expenseRepo.SaveChangesAsync(ct);
@@ -448,9 +448,9 @@ public class InventoryService(
         return list.GroupBy(e => e.Category)
                    .Select(g => new ExpenseSummaryDto
                    {
-                       Category    = g.Key,
+                       Category = g.Key,
                        TotalAmount = g.Sum(e => e.Amount),
-                       Count       = g.Count()
+                       Count = g.Count()
                    })
                    .OrderByDescending(s => s.TotalAmount)
                    .ToList();
@@ -472,58 +472,58 @@ public class InventoryService(
 
     private static ProductDto MapProduct(Product p) => new()
     {
-        Id            = p.Id,
-        Name          = p.Name,
-        CategoryId    = p.CategoryId,
+        Id = p.Id,
+        Name = p.Name,
+        CategoryId = p.CategoryId,
         PurchasePrice = p.PurchasePrice,
-        SellingPrice  = p.SellingPrice,
-        IsActive      = p.IsActive
+        SellingPrice = p.SellingPrice,
+        IsActive = p.IsActive
     };
 
     private static ProductVariantDto MapVariant(ProductVariant v) => new()
     {
-        Id          = v.Id,
-        ProductId   = v.ProductId,
+        Id = v.Id,
+        ProductId = v.ProductId,
         VariantType = v.VariantType,
-        Value       = v.Value
+        Value = v.Value
     };
 
     private static InvoiceDto MapInvoice(Invoice i, IEnumerable<InvoiceItem> items) => new()
     {
-        Id           = i.Id,
-        InvoiceNo    = i.InvoiceNo,
-        Date         = i.Date,
+        Id = i.Id,
+        InvoiceNo = i.InvoiceNo,
+        Date = i.Date,
         CustomerName = i.CustomerName,
-        TotalAmount  = i.TotalAmount,
-        PaidAmount   = i.PaidAmount,
-        PendingAmount= i.PendingAmount,
-        Status       = i.Status,
-        Items        = items.Select(x => new InvoiceItemDto
+        TotalAmount = i.TotalAmount,
+        PaidAmount = i.PaidAmount,
+        PendingAmount = i.PendingAmount,
+        Status = i.Status,
+        Items = items.Select(x => new InvoiceItemDto
         {
-            Id        = x.Id,
+            Id = x.Id,
             InvoiceId = x.InvoiceId,
             ProductId = x.ProductId,
-            Quantity  = x.Quantity,
-            Rate      = x.Rate,
-            Amount    = x.Amount
+            Quantity = x.Quantity,
+            Rate = x.Rate,
+            Amount = x.Amount
         }).ToList()
     };
 
     private static InventoryOrderDto MapOrder(InventoryOrder o) => new()
     {
-        Id           = o.Id,
-        OrderNo      = o.OrderNo,
-        Date         = o.Date,
+        Id = o.Id,
+        OrderNo = o.OrderNo,
+        Date = o.Date,
         CustomerName = o.CustomerName,
-        Status       = o.Status
+        Status = o.Status
     };
 
     private static ExpenseDto MapExpense(Expense e) => new()
     {
-        Id          = e.Id,
+        Id = e.Id,
         ExpenseName = e.ExpenseName,
-        Amount      = e.Amount,
-        Date        = e.Date,
-        Category    = e.Category
+        Amount = e.Amount,
+        Date = e.Date,
+        Category = e.Category
     };
 }

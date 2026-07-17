@@ -109,6 +109,11 @@ public class AppDbContext(DbContextOptions<AppDbContext> options, ICurrentSchool
 
     public DbSet<MenuItem>           MenuItems          => Set<MenuItem>();
 
+    // ── Roles & Permissions ─────────────────────────────────
+    public DbSet<Role>               Roles              => Set<Role>();
+    public DbSet<Permission>         Permissions        => Set<Permission>();
+    public DbSet<RolePermission>     RolePermissions    => Set<RolePermission>();
+
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         // Apply decimal(18,2) globally to all decimal properties
@@ -147,6 +152,35 @@ public class AppDbContext(DbContextOptions<AppDbContext> options, ICurrentSchool
                 .HasForeignKey(m => m.ParentId)
                 .OnDelete(DeleteBehavior.Restrict);
         });
+
+        modelBuilder.Entity<Permission>(e =>
+        {
+            e.HasIndex(p => p.Key).IsUnique();
+            e.Property(p => p.Key).HasMaxLength(100);
+            e.Property(p => p.Module).HasMaxLength(50);
+        });
+
+        modelBuilder.Entity<Role>(e =>
+            e.HasIndex(r => new { r.SchoolId, r.Name }).IsUnique());
+
+        modelBuilder.Entity<RolePermission>(e =>
+        {
+            e.HasKey(rp => new { rp.RoleId, rp.PermissionId });
+            e.HasOne(rp => rp.Role)
+                .WithMany(r => r.RolePermissions)
+                .HasForeignKey(rp => rp.RoleId)
+                .OnDelete(DeleteBehavior.Cascade);
+            e.HasOne(rp => rp.Permission)
+                .WithMany()
+                .HasForeignKey(rp => rp.PermissionId)
+                .OnDelete(DeleteBehavior.Cascade);
+        });
+
+        modelBuilder.Entity<User>()
+            .HasOne(u => u.CustomRole)
+            .WithMany()
+            .HasForeignKey(u => u.RoleId)
+            .OnDelete(DeleteBehavior.SetNull);
 
         // ── Multi-tenancy: apply a global query filter to every ITenantEntity ──
         var setQueryFilterMethod = typeof(AppDbContext)

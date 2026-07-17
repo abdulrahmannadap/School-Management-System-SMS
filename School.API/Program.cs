@@ -1,5 +1,6 @@
 using System.Text;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using School.Application.Interfaces;
@@ -8,10 +9,12 @@ using School.Application.Services.Exam;
 using School.Application.Services.Inventory;
 using School.Application.Services.Library;
 using School.Application.Services.Fees;
+using School.Application.Services.Role;
 using School.Application.Services.Staff;
 using School.Application.Services.Student;
 using School.Infrastructure.Services;
 using School.Persistence;
+using School.API.Authorization;
 using School.API.Services;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -31,6 +34,8 @@ builder.Services.AddScoped<IFeesService, FeesService>();
 builder.Services.AddScoped<IExamService, ExamService>();
 builder.Services.AddScoped<ILibraryService, LibraryService>();
 builder.Services.AddScoped<IInventoryService, InventoryService>();
+builder.Services.AddScoped<IRoleService, RoleService>();
+builder.Services.AddSingleton<IAuthorizationHandler, PermissionAuthorizationHandler>();
 
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
     .AddJwtBearer(o =>
@@ -48,7 +53,14 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
         };
     });
 
-builder.Services.AddAuthorization();
+builder.Services.AddAuthorization(options =>
+{
+    foreach (var permission in PermissionCatalog.All)
+    {
+        options.AddPolicy($"Permission:{permission.Key}", policy =>
+            policy.Requirements.Add(new PermissionRequirement(permission.Key)));
+    }
+});
 
 var app = builder.Build();
 
@@ -57,6 +69,7 @@ using (var scope = app.Services.CreateScope())
     var db = scope.ServiceProvider.GetRequiredService<AppDbContext>();
     db.Database.Migrate();
     SeedData.Seed(db);
+    PermissionCatalog.Seed(db);
 }
 
 if (app.Environment.IsDevelopment())

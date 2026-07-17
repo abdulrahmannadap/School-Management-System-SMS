@@ -54,16 +54,19 @@ public class FeesController(IFeesService svc) : ControllerBase
     }
 
     [HttpGet("students/{studentId:int}/ledger")]
+    [Authorize(Policy = "Permission:Fees.View")]
     public async Task<IActionResult> GetLedger(int studentId, CancellationToken ct)
         => Ok(await svc.GetLedgerAsync(studentId, ct));
 
     [HttpGet("students/{studentId:int}/pending")]
+    [Authorize(Policy = "Permission:Fees.View")]
     public async Task<IActionResult> GetPending(int studentId, CancellationToken ct)
         => Ok(await svc.GetPendingFeesAsync(studentId, ct));
 
     // ── Payment ──────────────────────────────────────────────
 
     [HttpPost("students/{studentId:int}/payment")]
+    [Authorize(Policy = "Permission:Fees.Collect")]
     public async Task<IActionResult> ReceivePayment(int studentId, [FromBody] ReceivePaymentDto dto, CancellationToken ct)
     {
         dto.StudentId = studentId;
@@ -72,6 +75,7 @@ public class FeesController(IFeesService svc) : ControllerBase
     }
 
     [HttpPost("payment/cancel")]
+    [Authorize(Policy = "Permission:Fees.Collect")]
     public async Task<IActionResult> CancelReceipt([FromBody] CancelReceiptDto dto, CancellationToken ct)
     {
         await svc.CancelReceiptAsync(dto, ct);
@@ -99,6 +103,7 @@ public class FeesController(IFeesService svc) : ControllerBase
     // ── Refund ───────────────────────────────────────────────
 
     [HttpPost("students/{studentId:int}/refund")]
+    [Authorize(Policy = "Permission:Fees.Refund")]
     public async Task<IActionResult> ProcessRefund(int studentId, [FromBody] FeeRefundDto dto, CancellationToken ct)
     {
         dto.StudentId = studentId;

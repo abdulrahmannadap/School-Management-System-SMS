@@ -8,7 +8,7 @@ namespace School.API.Controllers;
 
 [ApiController]
 [Route("api/[controller]")]
-public class AuthController(IJwtService jwtService, AppDbContext db) : ControllerBase
+public class AuthController(IJwtService jwtService, IRoleService roleService, AppDbContext db) : ControllerBase
 {
     [HttpPost("login")]
     public async Task<IActionResult> Login([FromBody] LoginRequestDto request)
@@ -23,9 +23,11 @@ public class AuthController(IJwtService jwtService, AppDbContext db) : Controlle
         if (user is null)
             return Unauthorized(new { message = "Invalid email or password." });
 
+        var permissionKeys = await roleService.GetUserPermissionKeysAsync(user.Id);
+
         return Ok(new AuthResponseDto
         {
-            Token     = jwtService.GenerateToken(user),
+            Token     = jwtService.GenerateToken(user, permissionKeys),
             FullName  = user.FullName,
             Role      = user.Role.ToString(),
             ExpiresAt = DateTime.UtcNow.AddHours(8)

@@ -14,10 +14,6 @@ public static class SeedData
         db.Users.AddRange(
             Make("superadmin@sms.com",      "SuperAdmin@123",  "Super Admin",     UserRole.SuperAdmin),
             Make("schooladmin@school.com",  "SchoolAdmin@123", "School Admin",    UserRole.SchoolAdmin),
-            Make("teacher@school.com",      "Teacher@123",     "Ali Teacher",     UserRole.Teacher),
-            Make("accounts@school.com",     "Accounts@123",    "Zara Accountant", UserRole.Accountant),
-            Make("staff@school.com",        "Staff@123",       "Omar Staff",      UserRole.Staff),
-            Make("parent@school.com",       "Parent@123",      "Ahmed Parent",    UserRole.Parent),
             Make("student@school.com",      "Student@123",     "Sara Student",    UserRole.Student)
         );
 

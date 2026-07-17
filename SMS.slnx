@@ -2,7 +2,7 @@
   <Project Path="School.API/School.API.csproj" />
   <Project Path="School.Application/School.Application.csproj" />
   <Project Path="School.Domain/School.Domain.csproj" />
+  <Project Path="School.ERP/School.ERP.csproj" Id="ac0fc9ef-b655-42d2-987c-7733a738bf79" />
   <Project Path="School.Infrastructure/School.Infrastructure.csproj" />
   <Project Path="School.Persistence/School.Persistence.csproj" />
-  <Project Path="School.Web/School.Web.csproj" />
 </Solution>

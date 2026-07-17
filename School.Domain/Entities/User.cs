@@ -14,4 +14,7 @@ public class User
     public int? StudentId { get; set; }
     public int? StaffId { get; set; }
     public Guid? SchoolId { get; set; }
+
+    public Guid? RoleId { get; set; }
+    public Role? CustomRole { get; set; }
 }

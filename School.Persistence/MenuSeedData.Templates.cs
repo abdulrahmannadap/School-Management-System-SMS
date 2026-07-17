@@ -94,7 +94,7 @@ public static partial class MenuSeedData
             new("Main", "Dashboard", "bi-speedometer2", "Teacher", "Home", "Index", []),
             new("Classroom", "My Classes", "bi-grid-3x3-gap", null, null, null, [
                 new(null, "Class List", "bi-list-ul", null, null, null, []),
-                new(null, "My Students", "bi-people", null, null, null, []),
+                new(null, "Admission", "bi-people", "Teacher", "Students", "Index", []),
                 new(null, "Timetable", "bi-calendar3", null, null, null, []),
             ]),
             new("Classroom", "Attendance", "bi-calendar-check", null, null, null, [
@@ -117,14 +117,14 @@ public static partial class MenuSeedData
             new("Main", "Dashboard", "bi-speedometer2", "Accountant", "Home", "Index", []),
             new("Fees", "Fee Collection", "bi-cash-stack", null, null, null, [
                 new(null, "Collect Fee", "bi-plus-circle", "Accountant", "Fees", "Index", []),
-                new(null, "Pending Fees", "bi-clock-history", null, null, null, []),
-                new(null, "Fee Ledger", "bi-receipt", null, null, null, []),
-                new(null, "Refunds", "bi-arrow-counterclockwise", "Accountant", "Fees", "Index", []),
-                new(null, "Discounts", "bi-percent", "Accountant", "Fees", "Index", []),
+                new(null, "Pending Fees", "bi-clock-history", "Accountant", "Fees", "PendingFees", []),
+                new(null, "Fee Ledger", "bi-receipt", "Accountant", "Fees", "Ledger", []),
+                new(null, "Refunds", "bi-arrow-counterclockwise", "Accountant", "Fees", "Refunds", []),
+                new(null, "Discounts", "bi-percent", "Accountant", "Fees", "Discounts", []),
             ]),
             new("Banking", "Banking", "bi-bank", null, null, null, [
-                new(null, "Cheques", "bi-check2-circle", "Accountant", "Fees", "Index", []),
-                new(null, "Deposits", "bi-safe", "Accountant", "Fees", "Index", []),
+                new(null, "Cheques", "bi-check2-circle", "Accountant", "Fees", "Cheques", []),
+                new(null, "Deposits", "bi-safe", "Accountant", "Fees", "Deposits", []),
                 new(null, "Vouchers", "bi-file-earmark-text", "Accountant", "Fees", "Vouchers", []),
             ]),
             new("Billing", "Billing", "bi-receipt", null, null, null, [

@@ -1,5 +1,5 @@
 @model School.Web.Models.Students.StudentsIndexViewModel
-@{ ViewData["Title"] = "Students"; }
+@{ ViewData["Title"] = "Admission"; }
 
 @if (TempData["Success"] is string success)
 {
@@ -50,7 +50,7 @@
 
 <div class="card border-0 shadow-sm">
     <div class="card-header bg-white border-0 pt-3 d-flex justify-content-between align-items-center">
-        <h6 class="mb-0 fw-semibold"><i class="bi bi-people-fill me-2 text-primary"></i>Students</h6>
+        <h6 class="mb-0 fw-semibold"><i class="bi bi-person-plus-fill me-2 text-primary"></i>Admission</h6>
         @if (Model.Classes.Any() && Model.Divisions.Any() && Model.FinancialYears.Any())
         {
             <button type="button" class="btn btn-sm btn-primary" onclick="openCreateModal()">

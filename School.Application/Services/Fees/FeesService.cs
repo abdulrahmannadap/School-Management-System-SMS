@@ -142,6 +142,54 @@ public class FeesService(
         };
     }
 
+    /// <summary>Pending balance per student across the whole school, for the Accountant's
+    /// "Pending Fees" screen — same computation as <see cref="GetPendingFeesAsync"/>, just
+    /// grouped over every student's ledger/discount rows instead of one.</summary>
+    public async Task<IReadOnlyList<FeePendingDto>> GetAllPendingFeesAsync(CancellationToken ct = default)
+    {
+        var ledger    = await ledgerRepo.GetAllAsync(ct);
+        var discounts = await discountRepo.GetAllAsync(ct);
+
+        var discountByStudent = discounts.GroupBy(d => d.StudentId)
+            .ToDictionary(g => g.Key, g => g.Sum(d => d.Amount));
+
+        return ledger.GroupBy(l => l.StudentId)
+            .Select(g =>
+            {
+                var totalFees  = g.Sum(l => l.Debit);
+                var totalPaid  = g.Sum(l => l.Credit);
+                var discount   = discountByStudent.GetValueOrDefault(g.Key);
+                var pending    = totalFees - totalPaid - discount;
+                return new FeePendingDto
+                {
+                    StudentId     = g.Key,
+                    TotalFees     = totalFees,
+                    PaidAmount    = totalPaid,
+                    PendingAmount = pending < 0 ? 0 : pending
+                };
+            })
+            .Where(p => p.PendingAmount > 0)
+            .OrderByDescending(p => p.PendingAmount)
+            .ToList();
+    }
+
+    public async Task<IReadOnlyList<FeeLedgerDto>> GetAllLedgerAsync(DateTime from, DateTime to, CancellationToken ct = default)
+    {
+        var list = await ledgerRepo.FindAsync(l => l.Date >= from.Date && l.Date <= to.Date, ct);
+        return list.OrderByDescending(l => l.Date)
+                   .Select(l => new FeeLedgerDto
+                   {
+                       Id          = l.Id,
+                       StudentId   = l.StudentId,
+                       FeeMasterId = l.FeeMasterId,
+                       Debit       = l.Debit,
+                       Credit      = l.Credit,
+                       Date        = l.Date,
+                       Type        = l.Type,
+                       ReferenceNo = l.ReferenceNo
+                   }).ToList();
+    }
+
     // ── Payment ──────────────────────────────────────────────
 
     public async Task<ReceiptDto> ReceivePaymentAsync(ReceivePaymentDto dto, CancellationToken ct = default)
@@ -250,6 +298,12 @@ public class FeesService(
         return list.Select(d => new FeeDiscountDto { StudentId = d.StudentId, Amount = d.Amount, Reason = d.Reason }).ToList();
     }
 
+    public async Task<IReadOnlyList<FeeDiscountDto>> GetAllDiscountsAsync(CancellationToken ct = default)
+    {
+        var list = await discountRepo.GetAllAsync(ct);
+        return list.Select(d => new FeeDiscountDto { StudentId = d.StudentId, Amount = d.Amount, Reason = d.Reason }).ToList();
+    }
+
     // ── Refund ───────────────────────────────────────────────
 
     public async Task ProcessRefundAsync(FeeRefundDto dto, CancellationToken ct = default)
@@ -280,6 +334,12 @@ public class FeesService(
     public async Task<IReadOnlyList<FeeRefundDto>> GetRefundsAsync(int studentId, CancellationToken ct = default)
     {
         var list = await refundRepo.FindAsync(r => r.StudentId == studentId, ct);
+        return list.Select(r => new FeeRefundDto { StudentId = r.StudentId, Amount = r.Amount, Reason = r.Reason }).ToList();
+    }
+
+    public async Task<IReadOnlyList<FeeRefundDto>> GetAllRefundsAsync(CancellationToken ct = default)
+    {
+        var list = await refundRepo.GetAllAsync(ct);
         return list.Select(r => new FeeRefundDto { StudentId = r.StudentId, Amount = r.Amount, Reason = r.Reason }).ToList();
     }
 
@@ -345,6 +405,20 @@ public class FeesService(
                    }).ToList();
     }
 
+    public async Task<IReadOnlyList<DepositTransactionDto>> GetAllDepositTransactionsAsync(CancellationToken ct = default)
+    {
+        var list = await depositTxRepo.GetAllAsync(ct);
+        return list.OrderByDescending(d => d.Date)
+                   .Select(d => new DepositTransactionDto
+                   {
+                       StudentId       = d.StudentId,
+                       DepositMasterId = d.DepositMasterId,
+                       Amount          = d.Amount,
+                       Date            = d.Date,
+                       Type            = d.Type
+                   }).ToList();
+    }
+
     // ── Cheque ───────────────────────────────────────────────
 
     public async Task AddChequeAsync(ChequeDto dto, CancellationToken ct = default)
@@ -363,6 +437,21 @@ public class FeesService(
     public async Task<IReadOnlyList<ChequeDto>> GetChequesAsync(int studentId, CancellationToken ct = default)
     {
         var list = await chequeRepo.FindAsync(c => c.StudentId == studentId, ct);
+        return list.OrderByDescending(c => c.ChequeDate)
+                   .Select(c => new ChequeDto
+                   {
+                       Id         = c.Id,
+                       StudentId  = c.StudentId,
+                       ChequeNo   = c.ChequeNo,
+                       ChequeDate = c.ChequeDate,
+                       Amount     = c.Amount,
+                       IsCleared  = c.IsCleared
+                   }).ToList();
+    }
+
+    public async Task<IReadOnlyList<ChequeDto>> GetAllChequesAsync(CancellationToken ct = default)
+    {
+        var list = await chequeRepo.GetAllAsync(ct);
         return list.OrderByDescending(c => c.ChequeDate)
                    .Select(c => new ChequeDto
                    {
@@ -398,6 +487,29 @@ public class FeesService(
         await voucherRepo.AddAsync(entity, ct);
         await voucherRepo.SaveChangesAsync(ct);
         return new VoucherDto { Id = entity.Id, Date = entity.Date, Type = entity.Type, Amount = entity.Amount, Description = entity.Description };
+    }
+
+    public async Task<VoucherDto> UpdateVoucherAsync(VoucherDto dto, CancellationToken ct = default)
+    {
+        var entity = await voucherRepo.FirstOrDefaultAsync(v => v.Id == dto.Id, ct)
+            ?? throw new KeyNotFoundException($"Voucher {dto.Id} not found.");
+
+        entity.Date        = dto.Date;
+        entity.Type        = dto.Type;
+        entity.Amount      = dto.Amount;
+        entity.Description = dto.Description;
+
+        voucherRepo.Update(entity);
+        await voucherRepo.SaveChangesAsync(ct);
+        return new VoucherDto { Id = entity.Id, Date = entity.Date, Type = entity.Type, Amount = entity.Amount, Description = entity.Description };
+    }
+
+    public async Task DeleteVoucherAsync(int id, CancellationToken ct = default)
+    {
+        var entity = await voucherRepo.FirstOrDefaultAsync(v => v.Id == id, ct)
+            ?? throw new KeyNotFoundException($"Voucher {id} not found.");
+        voucherRepo.Delete(entity);
+        await voucherRepo.SaveChangesAsync(ct);
     }
 
     public async Task<IReadOnlyList<VoucherDto>> GetVouchersAsync(DateTime from, DateTime to, CancellationToken ct = default)

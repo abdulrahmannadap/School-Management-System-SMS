@@ -4,6 +4,8 @@ namespace School.Web.Models.Fees;
 
 public class VoucherFormModel
 {
+    public int Id { get; set; }
+
     [Required(ErrorMessage = "Date required")]
     [DataType(DataType.Date)]
     public DateTime Date { get; set; } = DateTime.Today;

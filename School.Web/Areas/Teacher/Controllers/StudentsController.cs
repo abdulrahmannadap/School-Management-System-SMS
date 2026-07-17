@@ -4,15 +4,15 @@ using School.Application.DTOs.Student;
 using School.Application.Interfaces;
 using School.Web.Models.Students;
 
-namespace School.Web.Areas.SchoolAdmin.Controllers;
+namespace School.Web.Areas.Teacher.Controllers;
 
-[Area("SchoolAdmin")]
-[Authorize(Policy = "SchoolAdminAccess")]
+[Area("Teacher")]
+[Authorize(Roles = "Teacher")]
 public class StudentsController(IStudentService studentSvc, IMastersService mastersSvc) : Controller
 {
     public async Task<IActionResult> Index([FromQuery] StudentSearchDto search, CancellationToken ct)
     {
-        ViewData["Title"] = "Students";
+        ViewData["Title"] = "Admission";
         return View(await BuildViewModel(search, ct));
     }
 
@@ -32,7 +32,7 @@ public class StudentsController(IStudentService studentSvc, IMastersService mast
 
         if (!ModelState.IsValid)
         {
-            ViewData["Title"] = "Students";
+            ViewData["Title"] = "Admission";
             var vm = await BuildViewModel(new StudentSearchDto(), ct);
             vm.Form = form;
             vm.ShowModal = true;

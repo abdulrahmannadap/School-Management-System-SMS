@@ -2,6 +2,7 @@ using School.Application.Common;
 using School.Application.DTOs.Student;
 using School.Application.Interfaces;
 using School.Domain.Entities;
+using School.Domain.Entities.Masters;
 using School.Domain.Entities.Student;
 using School.Domain.Enums;
 
@@ -19,8 +20,11 @@ public class StudentService(
     IGenericRepository<StudentLeaveRequest>              leaveRepo,
     IGenericRepository<StudentRfid>                      rfidRepo,
     IGenericRepository<ParentAppStatus>                  parentAppRepo,
-    IGenericRepository<User>                             userRepo) : IStudentService
+    IGenericRepository<User>                             userRepo,
+    IGenericRepository<Class>                             classRepo,
+    IGenericRepository<Division>                          divisionRepo) : IStudentService
 {
+    private const string UnassignedLabel = "Unassigned";
     // ── Core ─────────────────────────────────────────────────
 
     public async Task<IReadOnlyList<StudentBaseDto>> SearchAsync(StudentSearchDto search, CancellationToken ct = default)
@@ -55,15 +59,26 @@ public class StudentService(
     public async Task<StudentBaseDto> CreateAsync(CreateStudentDto dto, CancellationToken ct = default)
     {
         var grNumber = await GenerateGrNumberAsync(ct);
+        var (classId, divisionId) = await ResolveClassDivisionAsync(dto.ClassId, dto.DivisionId, ct);
 
         var entity = new Domain.Entities.Student.Student
         {
             FinancialYearId = dto.FinancialYearId,
-            ClassId         = dto.ClassId,
-            DivisionId      = dto.DivisionId,
+            ClassId         = classId,
+            DivisionId      = divisionId,
             FullName        = dto.FullName,
+            FirstName       = dto.FirstName,
+            MiddleName      = dto.MiddleName,
+            LastName        = dto.LastName,
             Gender          = dto.Gender,
             DateOfBirth     = dto.DateOfBirth,
+            PlaceOfBirth    = dto.PlaceOfBirth,
+            MotherTongue    = dto.MotherTongue,
+            Religion        = dto.Religion,
+            BloodGroup      = dto.BloodGroup,
+            Nationality     = dto.Nationality,
+            NativePlace     = dto.NativePlace,
+            Email           = dto.Email,
             GRNumber        = grNumber,
             IsActive        = true,
             CreatedAt       = DateTime.UtcNow
@@ -72,17 +87,85 @@ public class StudentService(
         await studentRepo.AddAsync(entity, ct);
         await studentRepo.SaveChangesAsync(ct);
 
-        // auto-create parent stub if FatherName provided
-        if (!string.IsNullOrWhiteSpace(dto.FatherName))
+        // auto-create parent/guardian record if any of those fields were provided
+        if (!string.IsNullOrWhiteSpace(dto.FatherName)  || !string.IsNullOrWhiteSpace(dto.MotherName) ||
+            !string.IsNullOrWhiteSpace(dto.GuardianName) || !string.IsNullOrWhiteSpace(dto.FatherMobile))
         {
-            var parent = new StudentParent
+            await SaveParentAsync(new StudentParentDto
             {
-                StudentId    = entity.Id,
-                FatherName   = dto.FatherName,
-                FatherMobile = dto.FatherMobile
-            };
-            await parentRepo.AddAsync(parent, ct);
-            await parentRepo.SaveChangesAsync(ct);
+                StudentId           = entity.Id,
+                FatherName          = dto.FatherName,
+                FatherQualification = dto.FatherQualification,
+                FatherOccupation    = dto.FatherOccupation,
+                FatherIncome        = dto.FatherIncome ?? 0,
+                FatherMobile        = dto.FatherMobile,
+                MotherName          = dto.MotherName,
+                MotherQualification = dto.MotherQualification,
+                MotherMobile        = dto.MotherMobile,
+                GuardianName        = dto.GuardianName,
+                GuardianRelation    = dto.GuardianRelation,
+                GuardianMobile      = dto.GuardianMobile
+            }, ct);
+        }
+
+        // auto-create address record if any address field was provided
+        if (!string.IsNullOrWhiteSpace(dto.FlatNo) || !string.IsNullOrWhiteSpace(dto.Building)  ||
+            !string.IsNullOrWhiteSpace(dto.Area)   || !string.IsNullOrWhiteSpace(dto.City)      ||
+            !string.IsNullOrWhiteSpace(dto.District) || !string.IsNullOrWhiteSpace(dto.State)   ||
+            !string.IsNullOrWhiteSpace(dto.PinCode))
+        {
+            await SaveAddressAsync(new StudentAddressDto
+            {
+                StudentId = entity.Id,
+                FlatNo    = dto.FlatNo,
+                Building  = dto.Building,
+                Area      = dto.Area,
+                City      = dto.City,
+                Landmark  = dto.Landmark,
+                District  = dto.District,
+                State     = dto.State,
+                PinCode   = dto.PinCode
+            }, ct);
+        }
+
+        // auto-create contact record if any contact field was provided
+        if (!string.IsNullOrWhiteSpace(dto.FatherPhone) || !string.IsNullOrWhiteSpace(dto.MotherPhone) ||
+            !string.IsNullOrWhiteSpace(dto.GuardianPhone) || !string.IsNullOrWhiteSpace(dto.WhatsAppNo) ||
+            !string.IsNullOrWhiteSpace(dto.ContactEmail))
+        {
+            await SaveContactAsync(new StudentContactDto
+            {
+                StudentId     = entity.Id,
+                FatherPhone   = dto.FatherPhone,
+                MotherPhone   = dto.MotherPhone,
+                GuardianPhone = dto.GuardianPhone,
+                WhatsAppNo    = dto.WhatsAppNo,
+                Email         = dto.ContactEmail
+            }, ct);
+        }
+
+        // admission-specific record (previous school, receipt/form no, confirming clerk, etc.)
+        if (!string.IsNullOrWhiteSpace(dto.LastSchoolAttended) || !string.IsNullOrWhiteSpace(dto.PreviousClass) ||
+            !string.IsNullOrWhiteSpace(dto.Medium)             || !string.IsNullOrWhiteSpace(dto.ReceiptNo)     ||
+            !string.IsNullOrWhiteSpace(dto.FormNo)             || !string.IsNullOrWhiteSpace(dto.AdmissionConfirmedClass) ||
+            !string.IsNullOrWhiteSpace(dto.ClerkName)          || dto.AdmissionDate.HasValue || dto.AcademicYearId.HasValue)
+        {
+            await SaveAdmissionAsync(new StudentAdmissionDto
+            {
+                StudentId               = entity.Id,
+                LastSchoolAttended      = dto.LastSchoolAttended,
+                PreviousClass           = dto.PreviousClass,
+                Medium                  = dto.Medium,
+                AdmissionDate           = dto.AdmissionDate ?? DateTime.UtcNow,
+                AdmissionClassId        = classId,
+                DivisionId              = divisionId,
+                GRNumber                = grNumber,
+                ReceiptNo               = dto.ReceiptNo,
+                FormNo                  = dto.FormNo,
+                AcademicYearId          = dto.AcademicYearId ?? 0,
+                AdmissionConfirmedClass = dto.AdmissionConfirmedClass,
+                ClerkName               = dto.ClerkName
+            }, ct);
         }
 
         // auto-create a portal login for the student
@@ -101,22 +184,140 @@ public class StudentService(
         return MapStudent(entity);
     }
 
+    /// <summary>Resolves the class/division to use at creation time. Either value left
+    /// blank (not decided yet, e.g. pending a placement test) falls back to a per-school
+    /// "Unassigned" class/division, created on first use, so Class/Division stay required
+    /// at the schema level while the admission form itself doesn't force a choice.</summary>
+    private async Task<(int ClassId, int DivisionId)> ResolveClassDivisionAsync(int? classId, int? divisionId, CancellationToken ct)
+    {
+        if (classId is > 0 && divisionId is > 0)
+            return (classId.Value, divisionId.Value);
+
+        var unassignedClass = await classRepo.FirstOrDefaultAsync(c => c.Name == UnassignedLabel, ct);
+        if (unassignedClass is null)
+        {
+            unassignedClass = new Class { Name = UnassignedLabel, OrderNo = 9999, IsActive = true };
+            await classRepo.AddAsync(unassignedClass, ct);
+            await classRepo.SaveChangesAsync(ct);
+        }
+
+        var effectiveClassId = classId is > 0 ? classId.Value : unassignedClass.Id;
+
+        if (divisionId is > 0)
+            return (effectiveClassId, divisionId.Value);
+
+        var unassignedDivision = await divisionRepo.FirstOrDefaultAsync(
+            d => d.ClassId == effectiveClassId && d.Name == UnassignedLabel, ct);
+        if (unassignedDivision is null)
+        {
+            unassignedDivision = new Division { Name = UnassignedLabel, ClassId = effectiveClassId };
+            await divisionRepo.AddAsync(unassignedDivision, ct);
+            await divisionRepo.SaveChangesAsync(ct);
+        }
+
+        return (effectiveClassId, unassignedDivision.Id);
+    }
+
     public async Task<StudentBaseDto> UpdateAsync(EditStudentDto dto, CancellationToken ct = default)
     {
         var entity = await studentRepo.FirstOrDefaultAsync(s => s.Id == dto.Id, ct)
             ?? throw new KeyNotFoundException($"Student {dto.Id} not found.");
 
-        entity.ClassId     = dto.ClassId;
-        entity.DivisionId  = dto.DivisionId;
-        entity.FullName    = dto.FullName;
-        entity.Gender      = dto.Gender;
-        entity.DateOfBirth = dto.DateOfBirth;
-        entity.Email       = dto.Email;
-        entity.IsActive    = dto.IsActive;
+        entity.ClassId      = dto.ClassId;
+        entity.DivisionId   = dto.DivisionId;
+        entity.FullName     = dto.FullName;
+        entity.FirstName    = dto.FirstName;
+        entity.MiddleName   = dto.MiddleName;
+        entity.LastName     = dto.LastName;
+        entity.Gender       = dto.Gender;
+        entity.DateOfBirth  = dto.DateOfBirth;
+        entity.PlaceOfBirth = dto.PlaceOfBirth;
+        entity.MotherTongue = dto.MotherTongue;
+        entity.Religion     = dto.Religion;
+        entity.BloodGroup   = dto.BloodGroup;
+        entity.Nationality  = dto.Nationality;
+        entity.NativePlace  = dto.NativePlace;
+        entity.Email        = dto.Email;
+        entity.IsActive     = dto.IsActive;
 
         studentRepo.Update(entity);
         await studentRepo.SaveChangesAsync(ct);
+
+        await SaveParentAsync(new StudentParentDto
+        {
+            StudentId           = entity.Id,
+            FatherName          = dto.FatherName,
+            FatherQualification = dto.FatherQualification,
+            FatherOccupation    = dto.FatherOccupation,
+            FatherIncome        = dto.FatherIncome ?? 0,
+            FatherMobile        = dto.FatherMobile,
+            MotherName          = dto.MotherName,
+            MotherQualification = dto.MotherQualification,
+            MotherMobile        = dto.MotherMobile,
+            GuardianName        = dto.GuardianName,
+            GuardianRelation    = dto.GuardianRelation,
+            GuardianMobile      = dto.GuardianMobile
+        }, ct);
+
+        await SaveAddressAsync(new StudentAddressDto
+        {
+            StudentId = entity.Id,
+            FlatNo    = dto.FlatNo,
+            Building  = dto.Building,
+            Area      = dto.Area,
+            City      = dto.City,
+            Landmark  = dto.Landmark,
+            District  = dto.District,
+            State     = dto.State,
+            PinCode   = dto.PinCode
+        }, ct);
+
+        await SaveContactAsync(new StudentContactDto
+        {
+            StudentId     = entity.Id,
+            FatherPhone   = dto.FatherPhone,
+            MotherPhone   = dto.MotherPhone,
+            GuardianPhone = dto.GuardianPhone,
+            WhatsAppNo    = dto.WhatsAppNo,
+            Email         = dto.ContactEmail
+        }, ct);
+
+        var existingAdmission = await GetAdmissionAsync(entity.Id, ct);
+        await SaveAdmissionAsync(new StudentAdmissionDto
+        {
+            StudentId               = entity.Id,
+            LastSchoolAttended      = dto.LastSchoolAttended,
+            PreviousClass           = dto.PreviousClass,
+            Medium                  = dto.Medium,
+            AdmissionDate           = dto.AdmissionDate ?? existingAdmission?.AdmissionDate ?? DateTime.UtcNow,
+            AdmissionClassId        = dto.ClassId,
+            DivisionId              = dto.DivisionId,
+            GRNumber                = entity.GRNumber,
+            ReceiptNo               = dto.ReceiptNo,
+            FormNo                  = dto.FormNo,
+            AcademicYearId          = dto.AcademicYearId ?? 0,
+            AdmissionConfirmedClass = dto.AdmissionConfirmedClass,
+            ClerkName               = dto.ClerkName
+        }, ct);
+
         return MapStudent(entity);
+    }
+
+    /// <summary>Combined read used to prefill the Edit form with everything the Create
+    /// form also collects (personal, parent, address, contact, admission details).</summary>
+    public async Task<StudentFullDetailsDto?> GetFullDetailsAsync(int studentId, CancellationToken ct = default)
+    {
+        var student = await GetAsync(studentId, ct);
+        if (student is null) return null;
+
+        return new StudentFullDetailsDto
+        {
+            Student   = student,
+            Parent    = await GetParentAsync(studentId, ct),
+            Address   = await GetAddressAsync(studentId, ct),
+            Contact   = await GetContactAsync(studentId, ct),
+            Admission = await GetAdmissionAsync(studentId, ct)
+        };
     }
 
     public async Task DeleteAsync(int id, CancellationToken ct = default)

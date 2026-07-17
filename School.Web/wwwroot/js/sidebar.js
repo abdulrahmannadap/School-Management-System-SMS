@@ -101,7 +101,16 @@
             try { linkPath = new URL(href, window.location.origin).pathname.toLowerCase(); }
             catch (e) { return; }
 
-            var isActive = currentPath === linkPath || (linkPath.length > 1 && currentPath.startsWith(linkPath + '/'));
+            // Exact match, or a numeric id-style sub-path of the same page (e.g. a link to
+            // "/Students" should stay active on "/Students/5"). This must NOT match two
+            // sibling actions under the same controller (e.g. "/Fees" vs "/Fees/PendingFees")
+            // — those are different pages, not a list/detail pair, so only a purely numeric
+            // remainder counts as "still the same page".
+            var isActive = currentPath === linkPath;
+            if (!isActive && linkPath.length > 1 && currentPath.startsWith(linkPath + '/')) {
+                var remainder = currentPath.slice(linkPath.length + 1);
+                isActive = /^\d+(\/|$)/.test(remainder);
+            }
             if (!isActive) return;
 
             matched = true;

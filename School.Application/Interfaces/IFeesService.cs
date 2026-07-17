@@ -16,6 +16,10 @@ public interface IFeesService
     Task<IReadOnlyList<FeeLedgerDto>> GetLedgerAsync(int studentId, CancellationToken ct = default);
     Task<FeePendingDto>               GetPendingFeesAsync(int studentId, CancellationToken ct = default);
 
+    // School-wide reads for the Accountant list screens (Pending Fees / Fee Ledger).
+    Task<IReadOnlyList<FeePendingDto>> GetAllPendingFeesAsync(CancellationToken ct = default);
+    Task<IReadOnlyList<FeeLedgerDto>>  GetAllLedgerAsync(DateTime from, DateTime to, CancellationToken ct = default);
+
     // ── Payment ──────────────────────────────────────────────
     Task<ReceiptDto>                    ReceivePaymentAsync(ReceivePaymentDto dto, CancellationToken ct = default);
     Task                                CancelReceiptAsync(CancelReceiptDto dto, CancellationToken ct = default);
@@ -24,10 +28,12 @@ public interface IFeesService
     // ── Discount ─────────────────────────────────────────────
     Task                                ApplyDiscountAsync(FeeDiscountDto dto, CancellationToken ct = default);
     Task<IReadOnlyList<FeeDiscountDto>> GetDiscountsAsync(int studentId, CancellationToken ct = default);
+    Task<IReadOnlyList<FeeDiscountDto>> GetAllDiscountsAsync(CancellationToken ct = default);
 
     // ── Refund ───────────────────────────────────────────────
     Task                               ProcessRefundAsync(FeeRefundDto dto, CancellationToken ct = default);
     Task<IReadOnlyList<FeeRefundDto>>  GetRefundsAsync(int studentId, CancellationToken ct = default);
+    Task<IReadOnlyList<FeeRefundDto>>  GetAllRefundsAsync(CancellationToken ct = default);
 
     // ── Deposit ──────────────────────────────────────────────
     Task<DepositMasterDto>               CreateDepositMasterAsync(DepositMasterDto dto, CancellationToken ct = default);
@@ -36,14 +42,18 @@ public interface IFeesService
     Task<IReadOnlyList<DepositMasterDto>> GetDepositMastersAsync(CancellationToken ct = default);
     Task                                 RecordDepositTransactionAsync(DepositTransactionDto dto, CancellationToken ct = default);
     Task<IReadOnlyList<DepositTransactionDto>> GetDepositTransactionsAsync(int studentId, CancellationToken ct = default);
+    Task<IReadOnlyList<DepositTransactionDto>> GetAllDepositTransactionsAsync(CancellationToken ct = default);
 
     // ── Cheque ───────────────────────────────────────────────
     Task                              AddChequeAsync(ChequeDto dto, CancellationToken ct = default);
     Task<IReadOnlyList<ChequeDto>>    GetChequesAsync(int studentId, CancellationToken ct = default);
+    Task<IReadOnlyList<ChequeDto>>    GetAllChequesAsync(CancellationToken ct = default);
     Task                              UpdateChequeStatusAsync(int chequeId, bool isCleared, CancellationToken ct = default);
 
     // ── Voucher ──────────────────────────────────────────────
     Task<VoucherDto>               CreateVoucherAsync(VoucherDto dto, CancellationToken ct = default);
+    Task<VoucherDto>               UpdateVoucherAsync(VoucherDto dto, CancellationToken ct = default);
+    Task                            DeleteVoucherAsync(int id, CancellationToken ct = default);
     Task<IReadOnlyList<VoucherDto>> GetVouchersAsync(DateTime from, DateTime to, CancellationToken ct = default);
 
     // ── Class Bank Mapping ───────────────────────────────────

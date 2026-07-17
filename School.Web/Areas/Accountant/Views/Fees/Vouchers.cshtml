@@ -70,6 +70,7 @@
                                     <th>Type</th>
                                     <th>Description</th>
                                     <th class="text-end">Amount</th>
+                                    <th class="text-end">Actions</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -89,6 +90,21 @@
                                         </td>
                                         <td>@v.Description</td>
                                         <td class="text-end">₹@v.Amount.ToString("N2")</td>
+                                        <td class="text-end">
+                                            <button type="button" class="btn btn-sm btn-outline-primary"
+                                                    data-id="@v.Id" data-date="@v.Date.ToString("yyyy-MM-dd")"
+                                                    data-type="@v.Type" data-amount="@v.Amount" data-description="@v.Description"
+                                                    onclick="loadVoucherForEdit(this.dataset)" title="Edit">
+                                                <i class="bi bi-pencil"></i>
+                                            </button>
+                                            <form asp-action="DeleteVoucher" method="post" class="d-inline" onsubmit="return confirm('Delete this voucher?');">
+                                                @Html.AntiForgeryToken()
+                                                <input type="hidden" name="id" value="@v.Id" />
+                                                <input type="hidden" name="from" value="@Model.From.ToString("yyyy-MM-dd")" />
+                                                <input type="hidden" name="to" value="@Model.To.ToString("yyyy-MM-dd")" />
+                                                <button type="submit" class="btn btn-sm btn-outline-danger" title="Delete"><i class="bi bi-trash"></i></button>
+                                            </form>
+                                        </td>
                                     </tr>
                                 }
                             </tbody>
@@ -101,37 +117,39 @@
 
     <div class="col-lg-4">
         <div class="card border-0 shadow-sm">
-            <div class="card-header bg-white border-0 pt-3">
-                <h6 class="mb-0 fw-semibold"><i class="bi bi-plus-circle me-2 text-primary"></i>New Voucher</h6>
+            <div class="card-header bg-white border-0 pt-3 d-flex justify-content-between align-items-center">
+                <h6 class="mb-0 fw-semibold"><i class="bi bi-plus-circle me-2 text-primary"></i><span id="voucherFormTitle">New Voucher</span></h6>
+                <button type="button" class="btn btn-sm btn-link" id="cancelEditBtn" style="display:none" onclick="resetVoucherForm()">Cancel edit</button>
             </div>
             <div class="card-body">
-                <form asp-action="SaveVoucher" method="post">
+                <form asp-action="SaveVoucher" method="post" id="voucherForm">
                     @Html.AntiForgeryToken()
                     <input type="hidden" name="from" value="@Model.From.ToString("yyyy-MM-dd")" />
                     <input type="hidden" name="to" value="@Model.To.ToString("yyyy-MM-dd")" />
+                    <input asp-for="Form.Id" type="hidden" id="Form_Id" />
                     <div class="mb-3">
                         <label class="form-label">Type</label>
-                        <select asp-for="Form.Type" class="form-select">
+                        <select asp-for="Form.Type" class="form-select" id="Form_Type">
                             <option value="Receipt">Receipt (Income)</option>
                             <option value="Payment">Payment (Expense)</option>
                         </select>
                     </div>
                     <div class="mb-3">
                         <label class="form-label">Date</label>
-                        <input asp-for="Form.Date" type="date" class="form-control" />
+                        <input asp-for="Form.Date" type="date" class="form-control" id="Form_Date" />
                         <span asp-validation-for="Form.Date" class="text-danger small"></span>
                     </div>
                     <div class="mb-3">
                         <label class="form-label">Amount</label>
-                        <input asp-for="Form.Amount" type="number" step="0.01" class="form-control" />
+                        <input asp-for="Form.Amount" type="number" step="0.01" class="form-control" id="Form_Amount" />
                         <span asp-validation-for="Form.Amount" class="text-danger small"></span>
                     </div>
                     <div class="mb-3">
                         <label class="form-label">Description</label>
-                        <input asp-for="Form.Description" class="form-control" />
+                        <input asp-for="Form.Description" class="form-control" id="Form_Description" />
                         <span asp-validation-for="Form.Description" class="text-danger small"></span>
                     </div>
-                    <button type="submit" class="btn btn-primary w-100"><i class="bi bi-check2-circle me-1"></i>Save Voucher</button>
+                    <button type="submit" class="btn btn-primary w-100" id="voucherSubmitBtn"><i class="bi bi-check2-circle me-1"></i>Save Voucher</button>
                 </form>
             </div>
         </div>
@@ -140,4 +158,30 @@
 
 @section Scripts {
     <partial name="_ValidationScriptsPartial" />
+    <script>
+        function loadVoucherForEdit(data) {
+            document.getElementById('Form_Id').value = data.id;
+            document.getElementById('Form_Type').value = data.type;
+            document.getElementById('Form_Date').value = data.date;
+            document.getElementById('Form_Amount').value = data.amount;
+            document.getElementById('Form_Description').value = data.description;
+            document.getElementById('voucherFormTitle').innerText = 'Edit Voucher';
+            document.getElementById('voucherSubmitBtn').innerHTML = '<i class="bi bi-check2-circle me-1"></i>Update Voucher';
+            document.getElementById('cancelEditBtn').style.display = '';
+            document.getElementById('voucherForm').scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }
+
+        function resetVoucherForm() {
+            document.getElementById('voucherForm').reset();
+            document.getElementById('Form_Id').value = 0;
+            document.getElementById('voucherFormTitle').innerText = 'New Voucher';
+            document.getElementById('voucherSubmitBtn').innerHTML = '<i class="bi bi-check2-circle me-1"></i>Save Voucher';
+            document.getElementById('cancelEditBtn').style.display = 'none';
+        }
+
+        @if (Model.Form.Id != 0)
+        {
+            <text>loadVoucherForEdit({ id: @Model.Form.Id, date: '@Model.Form.Date.ToString("yyyy-MM-dd")', type: '@Model.Form.Type', amount: @Model.Form.Amount, description: @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Model.Form.Description)) });</text>
+        }
+    </script>
 }

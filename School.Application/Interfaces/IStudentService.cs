@@ -10,6 +10,7 @@ public interface IStudentService
     Task<StudentBaseDto>                CreateAsync(CreateStudentDto dto, CancellationToken ct = default);
     Task<StudentBaseDto>                UpdateAsync(EditStudentDto dto, CancellationToken ct = default);
     Task                                DeleteAsync(int id, CancellationToken ct = default);
+    Task<StudentFullDetailsDto?>        GetFullDetailsAsync(int studentId, CancellationToken ct = default);
 
     // ── Parent ───────────────────────────────────────────────
     Task<StudentParentDto?>  GetParentAsync(int studentId, CancellationToken ct = default);

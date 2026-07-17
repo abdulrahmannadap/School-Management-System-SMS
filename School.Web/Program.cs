@@ -89,6 +89,8 @@ using (var scope = app.Services.CreateScope())
 {
     var db = scope.ServiceProvider.GetRequiredService<School.Persistence.AppDbContext>();
     await School.Persistence.MenuSeedData.SeedDefaultsAsync(db);
+    await School.Persistence.MenuSeedData.PatchTeacherAdmissionMenuAsync(db);
+    await School.Persistence.MenuSeedData.PatchAccountantFeeMenuAsync(db);
 }
 
 app.Run();
